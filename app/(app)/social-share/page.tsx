@@ -71,8 +71,7 @@ export default function page() {
           .toLowerCase()}.png`;
         document.body.appendChild(link);
         link.click();
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
+        window.URL.revokeObjectURL(url);  // removke means cancel/withdraw
         document.body.removeChild(link);
       });
   };
@@ -139,7 +138,7 @@ export default function page() {
                     crop="fill"
                     aspectRatio={socialFormats[selectedFormat].aspectRatio}
                     gravity="auto"
-                    ref={imageRef}
+                    ref={imageRef}  // giving ref is very important
                     onLoad={() => setIsTransforming(false)}
                   />
                 </div>
@@ -147,7 +146,7 @@ export default function page() {
 
               <div className="card-actions justify-end mt-6">
                 <button className="cursor-pointer" onClick={handleDownload}>
-                  Download for {selectedFormat}
+                  Download The Image
                 </button>
               </div>
             </div>
