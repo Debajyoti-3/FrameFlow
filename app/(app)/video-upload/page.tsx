@@ -10,11 +10,13 @@ function page() {
   const [isUploading, setIsUploading] = useState(false);
   const [description, setDescription] = useState<string>("");
 
-  // max file size is 70 mb
-  const MAX_FILE_SIZE = 70 * 1024 * 1024;
+  // max file size is 15 mb
+  const MAX_FILE_SIZE = 15 * 1024 * 1024;
   const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     if (!file) {
       return;
     }
@@ -40,7 +42,7 @@ function page() {
   };
   return (
         <div className="container mx-auto p-4">
-          <h1 className="text-2xl font-bold mb-4">Upload Video</h1>
+          <h1 className="text-2xl font-bold mb-4 text-red-500">Upload Video</h1>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="label">
@@ -52,6 +54,7 @@ function page() {
                 onChange={(e) => setTitle(e.target.value)}
                 className="input input-bordered w-full"
                 required
+                
               />
             </div>
             <div>
@@ -78,7 +81,7 @@ function page() {
             </div>
             <button
               type="submit"
-              className="btn btn-primary"
+              className="btn btn-primary bg-blue-700 p-1.5 rounded-2xl cursor-default"
               disabled={isUploading}
             >
               {isUploading ? "Uploading..." : "Upload Video"}

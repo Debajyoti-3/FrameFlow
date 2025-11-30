@@ -145,7 +145,7 @@ export default function page() {
               </div>
 
               <div className="card-actions justify-end mt-6">
-                <button className="cursor-pointer" onClick={handleDownload}>
+                <button className="cursor-pointer bg-blue-800 rounded-[3px] p-3" onClick={handleDownload}>
                   Download The Image
                 </button>
               </div>

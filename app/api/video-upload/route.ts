@@ -6,7 +6,7 @@ import { NextResponse, NextRequest } from "next/server";
 const prisma = new PrismaClient();
 
 cloudinary.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUD_NAME,
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET, // Click 'View API Keys' above to copy your API secret
 });
@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     }
 
     if (
-      !process.env.NEXT_PUBLIC_CLOUD_NAME ||
+      !process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME ||
       !process.env.CLOUDINARY_API_KEY ||
       !process.env.CLOUDINARY_API_SECRET
     ) {
@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
       }
     );
 
-    const video = prisma.video.create({
+    const video = await prisma.video.create({
       data: {
         title,
         description,
