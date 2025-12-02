@@ -10,7 +10,7 @@ import { FileDown, FileUp, Download, Clock } from "lucide-react";
 // @ts-ignore - dayjs extend method
 dayjs.extend(relativeTime);
 
-import { Video } from "@/app/generated/prisma/client";
+import { Video } from "@/types";
 import { getCldImageUrl, getCldVideoUrl } from "next-cloudinary";
 
 interface VideoCardProps {
@@ -18,7 +18,7 @@ interface VideoCardProps {
   onDownload: (url: string, title: string) => void;
 }
 
-const videoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
+const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [previewError, setPreviewError] = useState(false);
 
@@ -56,27 +56,27 @@ const videoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
     return filesize(size);
   }, []);
 
-   const formatDuration = useCallback((seconds: number) => {
-        const minutes = Math.floor(seconds / 60);
-        const remainingSeconds = Math.round(seconds % 60);
-        return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
-      }, []);
+  const formatDuration = useCallback((seconds: number) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = Math.round(seconds % 60);
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  }, []);
 
   const formatRelativeTime = useCallback((date: Date | string) => {
     return (dayjs(date) as any).fromNow() as string;
   }, []);
 
-      const compressionPercentage = Math.round(
-        (1 - Number(video.compressedSize) / Number(video.originalSize)) * 100
-      );
+  const compressionPercentage = Math.round(
+    (1 - Number(video.compressedSize) / Number(video.originalSize)) * 100
+  );
 
-      useEffect(() => {
-        setPreviewError(false);
-      }, [isHovered]);
+  useEffect(() => {
+    setPreviewError(false);
+  }, [isHovered]);
 
-      const handlePreviewError = () => {
-        setPreviewError(true);
-      };
+  const handlePreviewError = () => {
+    setPreviewError(true);
+  };
 
   return (
     <div
@@ -155,4 +155,4 @@ const videoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
   );
 };
 
-export default videoCard;
+export default VideoCard;
