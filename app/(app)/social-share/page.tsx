@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { CldImage } from "next-cloudinary";
 import axios from "axios";
+import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
 
 const socialFormats = {
   "Instagram Square (1:1)": { width: 1080, height: 1080, aspectRatio: "1:1" },
@@ -144,11 +145,16 @@ export default function page() {
                 </div>
               </div>
 
-              <div className="card-actions justify-end mt-6">
-                <button className="cursor-pointer bg-blue-800 rounded-[3px] p-3" onClick={handleDownload}>
-                  Download The Image
-                </button>
-              </div>
+              <div className="m-40 flex justify-center text-center">
+      <HoverBorderGradient
+        containerClassName="rounded-full"
+        as="button"
+        className="dark:bg-black bg-white text-black dark:text-white flex items-center space-x-2"
+        onClick={handleDownload}
+      >
+        Download Image
+      </HoverBorderGradient>
+    </div>
             </div>
           )}
         </div>
