@@ -32,6 +32,7 @@ export default function AppLayout({
 
   const handleLogoClick = () => {
     router.push("/");
+    console.log(user)
   };
 
   const handleSignOut = async () => {
@@ -79,7 +80,7 @@ export default function AppLayout({
                       />
                     </div>
                   </div>
-                  <span className="text-sm truncate max-w-xs lg:max-w-md">
+                  <span className="text-sm truncate max-w-xs lg:max-w-md max-md:hidden">
                     {user.username || user.emailAddresses[0].emailAddress}
                   </span>
                   <button

@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import axios from "axios";
 import VideoCard from "@/components/videoCard";
 import { Video } from "@/types"; // types of the video
+import { Spinner } from "@/components/ui/spinner";
 
 function Dashboard() {
   const [videos, setVideos] = useState<Video[]>([]);
@@ -56,7 +57,11 @@ function Dashboard() {
   }, []);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen w-full">
+        <Spinner className="size-12"/>
+      </div>
+    )
   }
 
   return (
