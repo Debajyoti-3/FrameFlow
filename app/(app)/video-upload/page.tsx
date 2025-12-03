@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 
 function page() {
   const [file, setFile] = useState<File | null>(null);
@@ -34,8 +35,14 @@ function page() {
 
     try {
       const res = await axios.post("/api/video-upload", formData);
+      if(!res.data){
+        toast.error("Error in File upload")
+        throw new Error("Error in file upload")
+      }
+      toast.success("File successfully uploaded")
     } catch (error) {
       console.log(error);
+      toast.error("Error while file upload")
     } finally {
       setIsUploading(false);
     }

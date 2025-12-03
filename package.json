@@ -16,7 +16,7 @@
     "class-variance-authority": "^0.7.1",
     "cloudinary": "^2.8.0",
     "clsx": "^2.1.1",
-    "dayjs": "^1.5.23",
+    "dayjs": "^1.11.19",
     "dotenv": "^17.2.3",
     "filesize": "^11.0.13",
     "lucide-react": "^0.555.0",
@@ -25,6 +25,7 @@
     "next-cloudinary": "^6.17.5",
     "react": "19.2.0",
     "react-dom": "19.2.0",
+    "react-hot-toast": "^2.6.0",
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {

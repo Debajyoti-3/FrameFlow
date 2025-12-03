@@ -3,7 +3,7 @@
 import React, { useCallback, useState, useEffect } from "react";
 import dayjs from "dayjs";
 // @ts-ignore - dayjs plugin types
-import relativeTime from "dayjs/plugin/relativeTime";
+import relativeTime from "dayjs/plugin/relativeTime.js";
 import { filesize } from "filesize";
 import { FileDown, FileUp, Download, Clock } from "lucide-react";
 

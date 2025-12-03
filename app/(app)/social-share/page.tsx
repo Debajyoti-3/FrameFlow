@@ -4,6 +4,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { CldImage } from "next-cloudinary";
 import axios from "axios";
 import { HoverBorderGradient } from "@/components/ui/hover-border-gradient";
+import toast from "react-hot-toast";
 
 const socialFormats = {
   "Instagram Square (1:1)": { width: 1080, height: 1080, aspectRatio: "1:1" },
@@ -48,10 +49,11 @@ export default function page() {
       if (!res.data) {
         throw new Error("Error in Image Upload");
       }
+      toast.success("File uploaded successfully")
       setUploadedImage(res.data.publicId);
     } catch (error) {
       console.log("Error while Image Uploading: ", error);
-
+      toast.error("Error in File Upload")
       alert("Error in File Upload");
     } finally {
       setIsUploading(false);
