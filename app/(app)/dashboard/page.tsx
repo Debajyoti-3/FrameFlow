@@ -6,6 +6,7 @@ import VideoCard from "@/components/videoCard";
 import { Video } from "@/types"; // types of the video
 import { Spinner } from "@/components/ui/spinner";
 import { VideoIcon } from "lucide-react";
+import { ModeToggle } from "@/components/theme-toggle";
 
 function Dashboard() {
   const [videos, setVideos] = useState<Video[]>([]);

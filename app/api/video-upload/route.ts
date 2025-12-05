@@ -18,6 +18,7 @@ interface CloudinaryUploadResult {
   [key: string]: any;
 }
 
+
 export async function POST(request: NextRequest) {
   try {
     const { userId } = await auth();

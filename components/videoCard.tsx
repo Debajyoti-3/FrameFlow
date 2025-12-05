@@ -6,6 +6,8 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime.js";
 import { filesize } from "filesize";
 import { FileDown, FileUp, Download, Clock } from "lucide-react";
+import { CldVideoPlayer } from "next-cloudinary";
+import "next-cloudinary/dist/cld-video-player.css";
 
 // @ts-ignore - dayjs extend method
 dayjs.extend(relativeTime);
@@ -24,6 +26,8 @@ interface VideoCardProps {
 const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [previewError, setPreviewError] = useState(false);
+  const [videoClicked, setVideoClicked] = useState(false);
+  const [ClickedPublicId, setClickedPublicId] = useState<string | null>(null)
 
   const getThumbnailUrl = useCallback((publicId: string) => {
     return getCldImageUrl({
@@ -54,6 +58,15 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
       rawTransformations: ["e_preview:duration_15:max_seg_9:min_seg_dur_1"],
     });
   }, []);
+
+  const handleVideoClick = (publicId: string) => {
+    setVideoClicked(true);
+    setClickedPublicId(publicId)
+  };
+  const handleCloseVideo = () => {
+    setVideoClicked(false);
+    setClickedPublicId(null);
+  };
 
   const formatSize = useCallback((size: number) => {
     return filesize(size);
@@ -87,8 +100,19 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="aspect-video relative bg-slate-100 overflow-hidden">
-        {isHovered ? (
+      <div
+        className="aspect-video relative bg-slate-100 overflow-hidden cursor-pointer"
+        onClick={()=>handleVideoClick(video.publicId)}
+      >
+        {videoClicked && ClickedPublicId ? (
+          <div onClick={(e) => e.stopPropagation()}>
+            <CldVideoPlayer 
+              width="1920" 
+              height="1080" 
+              src={ClickedPublicId}
+            />
+          </div>
+        ) : isHovered ? (
           previewError ? (
             <div className="w-full h-full flex items-center justify-center bg-slate-200">
               <p className="text-sm text-slate-500">Preview not available</p>
@@ -140,7 +164,9 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
           <div className="flex items-start gap-2 p-2 bg-slate-50 rounded-lg">
             <FileDown size={16} className="text-slate-600 mt-0.5 shrink-0" />
             <div className="min-w-0">
-              <div className="text-xs font-medium text-slate-500">Compressed</div>
+              <div className="text-xs font-medium text-slate-500">
+                Compressed
+              </div>
               <div className="text-sm font-semibold text-slate-900">
                 {formatSize(Number(video.compressedSize))}
               </div>
@@ -159,6 +185,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
             onClick={() =>
               onDownload(getFullVideoUrl(video.publicId), video.title)
             }
+            className="cursor-pointer"
           >
             <Download size={16} className="mr-1" />
             Download

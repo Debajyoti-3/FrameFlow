@@ -4,11 +4,17 @@ import React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { ImageIcon, VideoIcon, Share2Icon } from "lucide-react";
+import { ModeToggle } from "@/components/theme-toggle";
 
 function page() {
   const router = useRouter();
   return (
+    <>
+    <div className="mr-6">
+      <ModeToggle/>
+    </div>
     <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 flex flex-col items-center justify-center px-4">
+      
       <div className="max-w-4xl mx-auto text-center space-y-8">
         <div className="space-y-4">
           <div className="flex justify-center">
@@ -46,6 +52,7 @@ function page() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

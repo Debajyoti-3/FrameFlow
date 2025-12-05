@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useClerk, useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
+import { ModeToggle } from "@/components/theme-toggle";
 import {
   LogOutIcon,
   MenuIcon,
@@ -133,7 +134,7 @@ export default function AppLayout({
             </Button>
 
             <div className="flex-1 lg:hidden" />
-
+            
             <div className="flex items-center gap-4">
               {user && (
                 <>
@@ -168,6 +169,9 @@ export default function AppLayout({
                   </Button>
                 </>
               )}
+            </div>
+            <div>
+              <ModeToggle />
             </div>
           </div>
         </header>
