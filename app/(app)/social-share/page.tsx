@@ -133,8 +133,8 @@ export default function page() {
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">Social Media Image Creator</h1>
-        <p className="text-slate-600 mt-1">
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Social Media Image Creator</h1>
+        <p className="text-slate-600 dark:text-slate-400 mt-1">
           Transform your images for different social media platforms
         </p>
       </div>
@@ -161,14 +161,14 @@ export default function page() {
           {isUploading && (
             <div className="flex items-center justify-center py-8">
               <div className="flex flex-col items-center gap-4">
-                <Spinner className="size-8 text-slate-900" />
-                <p className="text-slate-600">Uploading image...</p>
+                <Spinner className="size-8 text-slate-900 dark:text-slate-100" />
+                <p className="text-slate-600 dark:text-slate-400">Uploading image...</p>
               </div>
             </div>
           )}
 
           {uploadedImage && (
-            <div className="space-y-6 pt-4 border-t border-slate-200">
+            <div className="space-y-6 pt-4 border-t border-slate-200 dark:border-slate-800">
               <div className="space-y-2">
                 <Label htmlFor="format-select">Select Social Media Format</Label>
                 <Select
@@ -188,18 +188,18 @@ export default function page() {
 
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-slate-900">Preview</h3>
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">Preview</h3>
                   <Button onClick={handleDownload}>
                     <DownloadIcon className="mr-2 h-4 w-4" />
                     Download Image
                   </Button>
                 </div>
-                <div className="relative flex justify-center bg-slate-50 rounded-lg p-4 border border-slate-200">
+                <div className="relative flex justify-center bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
                   {isTransforming && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-white/80 rounded-lg z-10">
+                    <div className="absolute inset-0 flex items-center justify-center bg-white/80 dark:bg-slate-900/80 rounded-lg z-10">
                       <div className="flex flex-col items-center gap-3">
-                        <Spinner className="size-8 text-slate-900" />
-                        <p className="text-sm text-slate-600">Transforming image...</p>
+                        <Spinner className="size-8 text-slate-900 dark:text-slate-100" />
+                        <p className="text-sm text-slate-600 dark:text-slate-400">Transforming image...</p>
                       </div>
                     </div>
                   )}
@@ -224,9 +224,9 @@ export default function page() {
           )}
 
           {!uploadedImage && !isUploading && (
-            <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-slate-200 rounded-lg">
-              <ImageIcon className="w-12 h-12 text-slate-400 mb-4" />
-              <p className="text-slate-600">No image uploaded yet</p>
+            <div className="flex flex-col items-center justify-center py-12 border-2 border-dashed border-slate-200 dark:border-slate-800 rounded-lg">
+              <ImageIcon className="w-12 h-12 text-slate-400 dark:text-slate-500 mb-4" />
+              <p className="text-slate-600 dark:text-slate-400">No image uploaded yet</p>
             </div>
           )}
         </CardContent>

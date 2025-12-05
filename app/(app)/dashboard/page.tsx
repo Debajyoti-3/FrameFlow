@@ -62,8 +62,8 @@ function Dashboard() {
     return (
       <div className="flex items-center justify-center min-h-[60vh] w-full">
         <div className="flex flex-col items-center gap-4">
-          <Spinner className="size-12 text-slate-900"/>
-          <p className="text-slate-600">Loading videos...</p>
+          <Spinner className="size-12 text-slate-900 dark:text-slate-100"/>
+          <p className="text-slate-600 dark:text-slate-400">Loading videos...</p>
         </div>
       </div>
     )
@@ -73,21 +73,21 @@ function Dashboard() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold text-slate-900">Videos</h1>
-          <p className="text-slate-600 mt-1">
+          <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Videos</h1>
+          <p className="text-slate-600 dark:text-slate-400 mt-1">
             Manage and download your compressed videos
           </p>
         </div>
       </div>
       {videos.length === 0 ? (
         <div className="flex flex-col items-center justify-center py-16 px-4">
-          <div className="p-4 bg-slate-100 rounded-full mb-4">
-            <VideoIcon className="w-8 h-8 text-slate-400" />
+          <div className="p-4 bg-slate-100 dark:bg-slate-800 rounded-full mb-4">
+            <VideoIcon className="w-8 h-8 text-slate-400 dark:text-slate-500" />
           </div>
-          <h3 className="text-lg font-semibold text-slate-900 mb-2">
+          <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
             No videos available
           </h3>
-          <p className="text-slate-600 text-center max-w-md">
+          <p className="text-slate-600 dark:text-slate-400 text-center max-w-md">
             Upload your first video to get started with compression
           </p>
         </div>

@@ -72,8 +72,8 @@ function page() {
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">Upload Video</h1>
-        <p className="text-slate-600 mt-1">
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Upload Video</h1>
+        <p className="text-slate-600 dark:text-slate-400 mt-1">
           Upload and compress your video files (max {MAX_FILE_SIZE / (1024 * 1024)}MB)
         </p>
       </div>
@@ -123,7 +123,7 @@ function page() {
                 />
               </div>
               {file && (
-                <p className="text-sm text-slate-600 mt-2">
+                <p className="text-sm text-slate-600 dark:text-slate-400 mt-2">
                   Selected: {file.name} ({formatFileSize(file.size)})
                 </p>
               )}

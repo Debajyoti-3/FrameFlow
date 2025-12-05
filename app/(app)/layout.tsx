@@ -46,7 +46,7 @@ export default function AppLayout({
   };
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
@@ -58,15 +58,15 @@ export default function AppLayout({
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed top-0 left-0 z-50 h-full w-64 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0",
+          "fixed top-0 left-0 z-50 h-full w-64 bg-white dark:bg-slate-900 border-r border-slate-200 dark:border-slate-800 transform transition-transform duration-300 ease-in-out lg:translate-x-0",
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex flex-col h-full">
-          <div className="flex items-center justify-between p-6 border-b border-slate-200">
+          <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
             <Link href="/" className="flex items-center gap-2">
-              <ImageIcon className="w-8 h-8 text-slate-900" />
-              <span className="text-xl font-bold text-slate-900">FrameFlow</span>
+              <ImageIcon className="w-8 h-8 text-slate-900 dark:text-slate-100" />
+              <span className="text-xl font-bold text-slate-900 dark:text-slate-100">FrameFlow</span>
             </Link>
             <Button
               variant="ghost"
@@ -91,8 +91,8 @@ export default function AppLayout({
                       className={cn(
                         "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
                         isActive
-                          ? "bg-slate-900 text-white"
-                          : "text-slate-700 hover:bg-slate-100"
+                          ? "bg-slate-900 text-white dark:bg-slate-100 dark:text-slate-900"
+                          : "text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800"
                       )}
                     >
                       <Icon className="w-5 h-5" />
@@ -105,7 +105,7 @@ export default function AppLayout({
           </nav>
 
           {user && (
-            <div className="p-4 border-t border-slate-200">
+            <div className="p-4 border-t border-slate-200 dark:border-slate-800">
               <Button
                 variant="outline"
                 className="w-full cursor-pointer"
@@ -122,7 +122,7 @@ export default function AppLayout({
       {/* Main content */}
       <div className="lg:pl-64">
         {/* Top navbar */}
-        <header className="sticky top-0 z-30 w-full border-b border-slate-200 bg-white/80 backdrop-blur-sm">
+        <header className="sticky top-0 z-30 w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
           <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
             <Button
               variant="ghost"
@@ -146,7 +146,7 @@ export default function AppLayout({
                           user.emailAddresses[0]?.emailAddress[0]?.toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
-                    <span className="text-sm font-medium text-slate-700 truncate max-w-[200px]">
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate max-w-[200px]">
                       {user.username || user.emailAddresses[0]?.emailAddress}
                     </span>
                   </div>
@@ -170,7 +170,7 @@ export default function AppLayout({
                 </>
               )}
             </div>
-            <div>
+            <div className="cursor-pointer">
               <ModeToggle />
             </div>
           </div>
