@@ -12,6 +12,9 @@ dayjs.extend(relativeTime);
 
 import { Video } from "@/types";
 import { getCldImageUrl, getCldVideoUrl } from "next-cloudinary";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface VideoCardProps {
   video: Video;
@@ -79,16 +82,16 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
   };
 
   return (
-    <div
-      className="card bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300"
+    <Card
+      className="overflow-hidden hover:shadow-lg transition-all duration-300 group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <figure className="aspect-video relative">
+      <div className="aspect-video relative bg-slate-100 overflow-hidden">
         {isHovered ? (
           previewError ? (
-            <div className="w-full h-full flex items-center justify-center bg-gray-200">
-              <p className="text-red-500">Preview not available</p>
+            <div className="w-full h-full flex items-center justify-center bg-slate-200">
+              <p className="text-sm text-slate-500">Preview not available</p>
             </div>
           ) : (
             <video
@@ -104,54 +107,65 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
           <img
             src={getThumbnailUrl(video.publicId)}
             alt={video.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
           />
         )}
-        <div className="absolute bottom-2 right-2 bg-base-100 bg-opacity-70 px-2 py-1 rounded-lg text-sm flex items-center">
-          <Clock size={16} className="mr-1" />
+        <div className="absolute bottom-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-1 rounded-md text-xs font-medium text-slate-900 flex items-center gap-1 shadow-sm">
+          <Clock size={14} />
           {formatDuration(video.duration)}
         </div>
-      </figure>
-      <div className="card-body p-4">
-        <h2 className="card-title text-lg font-bold">{video.title}</h2>
-        <p className="text-sm text-base-content opacity-70 mb-4">
-          {video.description}
-        </p>
-        <p className="text-sm text-base-content opacity-70 mb-4">
+      </div>
+      <CardContent className="p-5">
+        <h3 className="font-semibold text-lg text-slate-900 mb-2 line-clamp-1">
+          {video.title}
+        </h3>
+        {video.description && (
+          <p className="text-sm text-slate-600 mb-3 line-clamp-2">
+            {video.description}
+          </p>
+        )}
+        <p className="text-xs text-slate-500 mb-4">
           Uploaded {formatRelativeTime(video.createdAt)}
         </p>
-        <div className="grid grid-cols-2 gap-4 text-sm">
-          <div className="flex items-center">
-            <FileUp size={18} className="mr-2 text-primary" />
-            <div>
-              <div className="font-semibold">Original</div>
-              <div>{formatSize(Number(video.originalSize))}</div>
+        <div className="grid grid-cols-2 gap-4 mb-4">
+          <div className="flex items-start gap-2 p-2 bg-slate-50 rounded-lg">
+            <FileUp size={16} className="text-slate-600 mt-0.5 shrink-0" />
+            <div className="min-w-0">
+              <div className="text-xs font-medium text-slate-500">Original</div>
+              <div className="text-sm font-semibold text-slate-900">
+                {formatSize(Number(video.originalSize))}
+              </div>
             </div>
           </div>
-          <div className="flex items-center">
-            <FileDown size={18} className="mr-2 text-secondary" />
-            <div>
-              <div className="font-semibold">Compressed</div>
-              <div>{formatSize(Number(video.compressedSize))}</div>
+          <div className="flex items-start gap-2 p-2 bg-slate-50 rounded-lg">
+            <FileDown size={16} className="text-slate-600 mt-0.5 shrink-0" />
+            <div className="min-w-0">
+              <div className="text-xs font-medium text-slate-500">Compressed</div>
+              <div className="text-sm font-semibold text-slate-900">
+                {formatSize(Number(video.compressedSize))}
+              </div>
             </div>
           </div>
         </div>
-        <div className="flex justify-between items-center mt-4">
-          <div className="text-sm font-semibold">
-            Compression:{" "}
-            <span className="text-accent">{compressionPercentage}%</span>
+        <div className="flex justify-between items-center pt-4 border-t border-slate-200">
+          <div className="text-sm">
+            <span className="text-slate-600">Compression: </span>
+            <span className="font-semibold text-slate-900">
+              {compressionPercentage}%
+            </span>
           </div>
-          <button
-            className="btn btn-primary btn-sm"
+          <Button
+            size="sm"
             onClick={() =>
               onDownload(getFullVideoUrl(video.publicId), video.title)
             }
           >
-            <Download size={16} />
-          </button>
+            <Download size={16} className="mr-1" />
+            Download
+          </Button>
         </div>
-      </div>
-    </div>
+      </CardContent>
+    </Card>
   );
 };
 

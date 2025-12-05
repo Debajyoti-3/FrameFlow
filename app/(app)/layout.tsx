@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useClerk, useUser } from "@clerk/nextjs";
+import toast from "react-hot-toast";
 import {
   LogOutIcon,
   MenuIcon,
@@ -11,10 +12,14 @@ import {
   Share2Icon,
   UploadIcon,
   ImageIcon,
+  XIcon,
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
+import { cn } from "@/lib/utils";
 
 const sidebarItems = [
-  { href: "/dashboard", icon: LayoutDashboardIcon, label: "Home Page" },
+  { href: "/dashboard", icon: LayoutDashboardIcon, label: "Dashboard" },
   { href: "/social-share", icon: Share2Icon, label: "Social Share" },
   { href: "/video-upload", icon: UploadIcon, label: "Video Upload" },
 ];
@@ -32,114 +37,147 @@ export default function AppLayout({
 
   const handleLogoClick = () => {
     router.push("/");
-    console.log(user)
   };
 
   const handleSignOut = async () => {
     await signOut();
+    toast.success("logout successfully")
   };
 
   return (
-    <div className="drawer lg:drawer-open">
-      <input
-        id="sidebar-drawer"
-        type="checkbox"
-        className="drawer-toggle"
-        checked={sidebarOpen}
-        onChange={() => setSidebarOpen(!sidebarOpen)}
-      />
-      <div className="drawer-content flex flex-col">
-        {/* Navbar */}
-        <header className="w-full bg-base-200">
-          <div className="navbar max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex-none lg:hidden">
-              <label
-                htmlFor="sidebar-drawer"
-                className="btn btn-square btn-ghost drawer-button"
+    <div className="min-h-screen bg-slate-50">
+      {/* Mobile sidebar overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
+      {/* Sidebar */}
+      <aside
+        className={cn(
+          "fixed top-0 left-0 z-50 h-full w-64 bg-white border-r border-slate-200 transform transition-transform duration-300 ease-in-out lg:translate-x-0",
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        <div className="flex flex-col h-full">
+          <div className="flex items-center justify-between p-6 border-b border-slate-200">
+            <Link href="/" className="flex items-center gap-2">
+              <ImageIcon className="w-8 h-8 text-slate-900" />
+              <span className="text-xl font-bold text-slate-900">FrameFlow</span>
+            </Link>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <XIcon className="h-5 w-5" />
+            </Button>
+          </div>
+
+          <nav className="flex-1 p-4">
+            <ul className="space-y-2">
+              {sidebarItems.map((item) => {
+                const Icon = item.icon;
+                const isActive = pathname === item.href;
+                return (
+                  <li key={item.href}>
+                    <Link
+                      href={item.href}
+                      onClick={() => setSidebarOpen(false)}
+                      className={cn(
+                        "flex items-center gap-3 px-4 py-3 rounded-lg transition-colors",
+                        isActive
+                          ? "bg-slate-900 text-white"
+                          : "text-slate-700 hover:bg-slate-100"
+                      )}
+                    >
+                      <Icon className="w-5 h-5" />
+                      <span className="font-medium">{item.label}</span>
+                    </Link>
+                  </li>
+                );
+              })}
+            </ul>
+          </nav>
+
+          {user && (
+            <div className="p-4 border-t border-slate-200">
+              <Button
+                variant="outline"
+                className="w-full cursor-pointer"
+                onClick={handleSignOut}
               >
-                <MenuIcon />
-              </label>
+                <LogOutIcon className="mr-2 h-4 w-4" />
+                Sign Out
+              </Button>
             </div>
-            <div className="flex-1">
-              <Link href="/" onClick={handleLogoClick}>
-                <div className="btn btn-ghost normal-case text-2xl font-bold tracking-tight cursor-pointer">
-                  FrameFlow
-                </div>
-              </Link>
-            </div>
-            <div className="flex-none flex items-center space-x-4">
+          )}
+        </div>
+      </aside>
+
+      {/* Main content */}
+      <div className="lg:pl-64">
+        {/* Top navbar */}
+        <header className="sticky top-0 z-30 w-full border-b border-slate-200 bg-white/80 backdrop-blur-sm">
+          <div className="flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="lg:hidden"
+              onClick={() => setSidebarOpen(true)}
+            >
+              <MenuIcon className="h-5 w-5" />
+            </Button>
+
+            <div className="flex-1 lg:hidden" />
+
+            <div className="flex items-center gap-4">
               {user && (
                 <>
-                  <div className="avatar">
-                    <div className="w-8 h-8 rounded-full">
-                      <img
-                        src={user.imageUrl}
-                        alt={
-                          user.username || user.emailAddresses[0].emailAddress
-                        }
-                      />
-                    </div>
+                  <div className="hidden sm:flex items-center gap-3">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.imageUrl} />
+                      <AvatarFallback>
+                        {user.username?.[0]?.toUpperCase() ||
+                          user.emailAddresses[0]?.emailAddress[0]?.toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="text-sm font-medium text-slate-700 truncate max-w-[200px]">
+                      {user.username || user.emailAddresses[0]?.emailAddress}
+                    </span>
                   </div>
-                  <span className="text-sm truncate max-w-xs lg:max-w-md max-md:hidden">
-                    {user.username || user.emailAddresses[0].emailAddress}
-                  </span>
-                  <button
+                  <div className="sm:hidden">
+                    <Avatar className="h-8 w-8">
+                      <AvatarImage src={user.imageUrl} />
+                      <AvatarFallback>
+                        {user.username?.[0]?.toUpperCase() ||
+                          user.emailAddresses[0]?.emailAddress[0]?.toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </div>
+                  <Button
+                    variant="ghost"
+                    size="icon"
                     onClick={handleSignOut}
-                    className="btn btn-ghost btn-circle"
+                    className="hidden sm:flex cursor-pointer"
                   >
-                    <LogOutIcon className="h-6 w-6" />
-                  </button>
+                    <LogOutIcon className="h-5 w-5" />
+                  </Button>
                 </>
               )}
             </div>
           </div>
         </header>
+
         {/* Page content */}
-        <main className="grow">
-          <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 my-8">
+        <main className="min-h-[calc(100vh-4rem)]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             {children}
           </div>
         </main>
-      </div>
-      <div className="drawer-side">
-        <label htmlFor="sidebar-drawer" className="drawer-overlay"></label>
-        <aside className="bg-base-200 w-64 h-full flex flex-col">
-          <div className="flex items-center justify-center py-4">
-            <Link
-            href={"/"}>
-              <ImageIcon className="w-10 h-10 text-primary" />
-            </Link>
-          </div>
-          <ul className="menu p-4 w-full text-base-content grow">
-            {sidebarItems.map((item) => (
-              <li key={item.href} className="mb-2">
-                <Link
-                  href={item.href}
-                  className={`flex items-center space-x-4 px-4 py-2 rounded-lg ${
-                    pathname === item.href
-                      ? "bg-gray-600 text-white"
-                      : "hover:bg-base-300 "
-                  }`}
-                  onClick={() => setSidebarOpen(false)}
-                >
-                  <item.icon className="w-6 h-6" />
-                  <span>{item.label}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-          {user && (
-            <div className="p-4">
-              <button
-                onClick={handleSignOut}
-                className="btn btn-outline btn-error w-full"
-              >
-                <LogOutIcon className="mr-2 h-5 w-5" />
-                Sign Out
-              </button>
-            </div>
-          )}
-        </aside>
       </div>
     </div>
   );

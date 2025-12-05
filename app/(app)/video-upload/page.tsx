@@ -4,6 +4,13 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { UploadIcon, Loader2Icon } from "lucide-react";
+import { Spinner } from "@/components/ui/spinner";
 
 function page() {
   const [file, setFile] = useState<File | null>(null);
@@ -19,11 +26,12 @@ function page() {
     e.preventDefault();
     
     if (!file) {
+      toast.error("Please select a video file");
       return;
     }
     if (file.size > MAX_FILE_SIZE) {
-      // TODO: use Toast notifications
-      alert("Max File Size Exceeded");
+      toast.error(`File size exceeds ${MAX_FILE_SIZE / (1024 * 1024)}MB limit`);
+      return;
     }
 
     setIsUploading(true);
@@ -40,6 +48,11 @@ function page() {
         throw new Error("Error in file upload")
       }
       toast.success("File successfully uploaded")
+      // Reset form
+      setFile(null);
+      setTitle("");
+      setDescription("");
+      router.push("/dashboard");
     } catch (error) {
       console.log(error);
       toast.error("Error while file upload")
@@ -47,55 +60,97 @@ function page() {
       setIsUploading(false);
     }
   };
+
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return "0 Bytes";
+    const k = 1024;
+    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + " " + sizes[i];
+  };
+
   return (
-        <div className="container mx-auto p-4">
-          <h1 className="text-2xl font-bold mb-4 text-red-500">Upload Video</h1>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="label">
-                <span className="label-text">Title</span>
-              </label>
-              <input
+    <div className="max-w-2xl mx-auto space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold text-slate-900">Upload Video</h1>
+        <p className="text-slate-600 mt-1">
+          Upload and compress your video files (max {MAX_FILE_SIZE / (1024 * 1024)}MB)
+        </p>
+      </div>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>Video Details</CardTitle>
+          <CardDescription>
+            Fill in the information about your video
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          <form onSubmit={handleSubmit} className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="title">Title</Label>
+              <Input
+                id="title"
                 type="text"
                 value={title}
                 onChange={(e) => setTitle(e.target.value)}
-                className="input input-bordered w-full"
+                placeholder="Enter video title"
                 required
-                
               />
             </div>
-            <div>
-              <label className="label">
-                <span className="label-text">Description</span>
-              </label>
-              <textarea
+
+            <div className="space-y-2">
+              <Label htmlFor="description">Description</Label>
+              <Textarea
+                id="description"
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="textarea textarea-bordered w-full"
+                placeholder="Enter video description (optional)"
+                rows={4}
               />
             </div>
-            <div>
-              <label className="label">
-                <span className="label-text">Video File</span>
-              </label>
-              <input
-                type="file"
-                accept="video/*"
-                onChange={(e) => setFile(e.target.files?.[0] || null)}
-                className="file-input file-input-bordered w-full"
-                required
-              />
+
+            <div className="space-y-2">
+              <Label htmlFor="file">Video File</Label>
+              <div className="flex items-center gap-4">
+                <Input
+                  id="file"
+                  type="file"
+                  accept="video/*"
+                  onChange={(e) => setFile(e.target.files?.[0] || null)}
+                  className="cursor-pointer"
+                  required
+                />
+              </div>
+              {file && (
+                <p className="text-sm text-slate-600 mt-2">
+                  Selected: {file.name} ({formatFileSize(file.size)})
+                </p>
+              )}
             </div>
-            <button
+
+            <Button
               type="submit"
-              className="btn btn-primary bg-blue-700 p-1.5 rounded-2xl cursor-default"
+              className="w-full"
               disabled={isUploading}
             >
-              {isUploading ? "Uploading..." : "Upload Video"}
-            </button>
+              {isUploading ? (
+                <>
+                  <Spinner className="mr-2 h-4 w-4" />
+                  Uploading...
+                </>
+              ) : (
+                <>
+                  <UploadIcon className="mr-2 h-4 w-4" />
+                  Upload Video
+                </>
+              )}
+            </Button>
           </form>
-        </div>
-      );
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
 
 export default page;

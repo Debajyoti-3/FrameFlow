@@ -5,6 +5,7 @@ import axios from "axios";
 import VideoCard from "@/components/videoCard";
 import { Video } from "@/types"; // types of the video
 import { Spinner } from "@/components/ui/spinner";
+import { VideoIcon } from "lucide-react";
 
 function Dashboard() {
   const [videos, setVideos] = useState<Video[]>([]);
@@ -58,18 +59,36 @@ function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen w-full">
-        <Spinner className="size-12"/>
+      <div className="flex items-center justify-center min-h-[60vh] w-full">
+        <div className="flex flex-col items-center gap-4">
+          <Spinner className="size-12 text-slate-900"/>
+          <p className="text-slate-600">Loading videos...</p>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="container mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Videos</h1>
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold text-slate-900">Videos</h1>
+          <p className="text-slate-600 mt-1">
+            Manage and download your compressed videos
+          </p>
+        </div>
+      </div>
       {videos.length === 0 ? (
-        <div className="text-center text-lg text-gray-500">
-          No videos available
+        <div className="flex flex-col items-center justify-center py-16 px-4">
+          <div className="p-4 bg-slate-100 rounded-full mb-4">
+            <VideoIcon className="w-8 h-8 text-slate-400" />
+          </div>
+          <h3 className="text-lg font-semibold text-slate-900 mb-2">
+            No videos available
+          </h3>
+          <p className="text-slate-600 text-center max-w-md">
+            Upload your first video to get started with compression
+          </p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
