@@ -1,6 +1,7 @@
 import { auth } from "@clerk/nextjs/server";
 import { v2 as cloudinary } from "cloudinary";
 import { NextResponse, NextRequest } from "next/server";
+import sharp from "sharp"; // using sharp for extra image meta-data/type checks
 
 // Configuration
 cloudinary.config({
@@ -18,7 +19,7 @@ export async function POST(request: NextRequest) {
   const { userId } = await auth();
 
   if (!userId) {
-    return NextResponse.json({ error: "Unauthorized", status: 401 });
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
   try {
     const formData = await request.formData();
@@ -29,7 +30,11 @@ export async function POST(request: NextRequest) {
     }
 
     const bytes = await file.arrayBuffer(); // creating bytes from the file
-    const buffer = Buffer.from(bytes);  // creating buffer from bytes (it will be uploaded in cloudinary)
+    const buffer = Buffer.from(bytes); // creating buffer from bytes (it will be uploaded in cloudinary)
+
+    const processed = await sharp(buffer)
+    .jpeg({ quality: 90 })
+    .toBuffer();
 
     const result = await new Promise<CloudinaryUploadResult>(
       (resolve, reject) => {
@@ -40,13 +45,13 @@ export async function POST(request: NextRequest) {
             else resolve(result as CloudinaryUploadResult);
           }
         );
-        uploadStream.end(buffer);
+        uploadStream.end(processed);
       }
     );
 
     return NextResponse.json({ publicId: result.public_id }, { status: 200 });
   } catch (error) {
-    console.log("Image upload failed", error)
+    console.log("Image upload failed", error);
     return NextResponse.json({ error: "Image upload failed" }, { status: 500 });
   }
 }
