@@ -1,39 +1,37 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
-import { createRouteMatcher } from "@clerk/nextjs/server";
-import { NextResponse } from "next/server";
+import { NextResponse, NextRequest } from "next/server";
 
+export function proxy(req: NextRequest) {
+  const token = req.cookies.get("token")?.value || "";
 
-
-const isPublicRoute = createRouteMatcher([
-  "/sign-in",
-  "/sign-up", 
-  "/", 
-  "/home"
-]);
-const isPublicApiRoute = createRouteMatcher(["/api/videos"]);
-
-
-
-export default clerkMiddleware(async (auth, req) => {
-  const { userId } = await auth();  // await is important here
   const currentUrl = new URL(req.url);
+
+  const isPublicRoute =
+    currentUrl.pathname === "/sign-in" ||
+    currentUrl.pathname === "/sign-up" ||
+    currentUrl.pathname === "/" ||
+    currentUrl.pathname === "/home";
+  
+    const isPublicApiRoute = currentUrl.pathname === "/api/videos";
+
   const isAccessingDashboard = currentUrl.pathname === "/dashboard";
-  const isAccessingHome =  currentUrl.pathname === '/';
+
+  const isAccessingHome = currentUrl.pathname === "/";
+
   const isApiRequest = currentUrl.pathname.startsWith("/api");
 
-  if (userId && isPublicRoute(req) && !isAccessingDashboard && !isAccessingHome) {
+  if (token && isPublicRoute && !isAccessingDashboard && !isAccessingHome) {
     return NextResponse.redirect(new URL("/", req.nextUrl));
   }
 
-  if (!userId) {
-    if (!isPublicRoute(req) && !isPublicApiRoute(req)) {
+  if (!token) {
+    if (!isPublicRoute && !isPublicApiRoute) {
       return NextResponse.redirect(new URL("/sign-in", req.nextUrl));
     }
-    if (isApiRequest && !isPublicApiRoute(req)) {
+    if (isApiRequest && !isPublicApiRoute) {
       return NextResponse.redirect(new URL("/sign-in", req.nextUrl));
     }
   }
-});
+}
 
 export const config = {
   matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
