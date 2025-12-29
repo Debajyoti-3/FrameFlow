@@ -1,7 +1,7 @@
-import { auth } from "@clerk/nextjs/server";
 import { PrismaClient } from "@/app/generated/prisma/client";
 import { v2 as cloudinary } from "cloudinary";
 import { NextResponse, NextRequest } from "next/server";
+import { CheckAuth } from "@/lib/checkAuth";
 
 const prisma = new PrismaClient();
 
@@ -21,9 +21,12 @@ interface CloudinaryUploadResult {
 
 export async function POST(request: NextRequest) {
   try {
-    const { userId } = await auth();
+    // const { userId } = await auth();
 
-    if (!userId) {
+    const user = await CheckAuth()
+    // const userId = user?.id
+
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized", status: 401 });
     }
 
