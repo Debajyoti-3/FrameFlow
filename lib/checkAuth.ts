@@ -1,22 +1,39 @@
-import axios from "axios";
+import { cookies } from "next/headers";
+import jwt from "jsonwebtoken";
 
 export interface AuthCheckResponse {
   id: string;
   email: string;
   name?: string;
+  imageUrl?: string;
 }
 
 export async function CheckAuth(): Promise<AuthCheckResponse | null> {
   try {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"}/api/authcheck`
-    );
+    const cookieStore = await cookies();
+    const token = cookieStore.get("token")?.value;
 
-    if (response.data && response.data.id) {
-      return response.data;
+    if (!token) {
+      return null;
     }
 
-    return null;
+    try {
+      const decoded = jwt.verify(token, process.env.JWT_SECRET_KEY!) as jwt.JwtPayload;
+      
+      if (!decoded || !decoded.id) {
+        return null;
+      }
+
+      return {
+          id: decoded.id,
+          email: decoded.email,
+          name: decoded.name // if you put name in the token payload
+      };
+
+    } catch (err) {
+      console.error("Token verification failed:", err);
+      return null;
+    }
   } catch (error) {
     console.error("Error in checkAuth:", error instanceof Error ? error.message : error);
     return null;

@@ -46,7 +46,7 @@ export async function GET(req: NextRequest) {
     return NextResponse.json({
       message: "auth check successful",
       success: true,
-      user: { id: user.id, email: user.email },
+      user: { id: user.id, email: user.email, name: user.name },
     });
   } catch (error) {
     console.error("authcheck error:", error);

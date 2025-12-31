@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
     const { email, password } = reqBody;
 
     if (!email || !password) {
-      return NextResponse.json({ message: "required fields are empty" });
+      return NextResponse.json({ message: "required fields are empty" }, { status: 400 });
     }
     const user = await prisma.user.findFirst({
       where: {
@@ -20,17 +20,18 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ message: "user is not registered yet" });
+      return NextResponse.json({ message: "user is not registered yet" }, { status: 400 });
     }
 
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
-      return NextResponse.json({ message: "given password is not valid" });
+      return NextResponse.json({ message: "given password is not valid" }, { status: 400 });
     }
 
     const tokenData = { // payload
         id: user.id,
         email: email,
+        name: user.name
     };
 
     const token = jwt.sign(tokenData, process.env.JWT_SECRET_KEY!, {

@@ -7,10 +7,10 @@ const prisma = new PrismaClient();
 export async function POST(req: NextRequest) {
   try {
     const reqBody = await req.json();
-    const { password, email } = reqBody;
+    const { password, email, name } = reqBody;
 
-    if (!password || !email) {
-      return NextResponse.json({ message: "Required fields are empty" });
+    if (!password || !email || !name) {
+      return NextResponse.json({ message: "Required fields are empty" }, { status: 400 });
     }
     const user = await prisma.user.findFirst({
       where: {
@@ -19,7 +19,7 @@ export async function POST(req: NextRequest) {
     });
 
     if(user){
-        return NextResponse.json({message:"user already existed"})
+        return NextResponse.json({message:"user already existed"}, { status: 400 })
     }
 
     const saltRounds = 10;
@@ -30,10 +30,11 @@ export async function POST(req: NextRequest) {
       data: {
         email,
         password: hashedPassword,
+        name
       },
     });
 
-    return NextResponse.json(newUser);
+    return NextResponse.json(newUser, { status: 201 });
 
   } catch (error) {
     console.log("Signup failed: ", error)

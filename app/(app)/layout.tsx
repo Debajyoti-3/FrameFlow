@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useClerk, useUser } from "@clerk/nextjs";
 import toast from "react-hot-toast";
+import axios from "axios";
 import { ModeToggle } from "@/components/theme-toggle";
 import {
   LogOutIcon,
@@ -27,25 +27,64 @@ const sidebarItems = [
   { href: "/remove-bg", icon: Eraser, label: "bg-Remove"},
 ];
 
+interface User {
+  id: string;
+  email: string;
+  name: string | null;
+}
+
 export default function AppLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
-  const { signOut } = useClerk();
-  const { user } = useUser();
+
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const response = await axios.get("/api/authcheck");
+        if (response.data.success) {
+          setUser(response.data.user);
+        } else {
+            setUser(null);
+            router.push("/sign-in");
+        }
+      } catch (error) {
+        console.error("Auth check failed", error);
+        setUser(null);
+        router.push("/sign-in");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
+  }, [router]);
 
   const handleLogoClick = () => {
     router.push("/");
   };
 
   const handleSignOut = async () => {
-    await signOut();
-    toast.success("logout successfully")
+    try {
+        await axios.get("/api/logout");
+        setUser(null);
+        toast.success("Logout successful");
+        router.push("/sign-in");
+    } catch (error) {
+        console.error("Logout failed", error);
+        toast.error("Logout failed");
+    }
   };
+  
+  if (loading) {
+      return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -142,22 +181,22 @@ export default function AppLayout({
                 <>
                   <div className="hidden sm:flex items-center gap-3">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.imageUrl} />
+                      <AvatarImage src="" />
                       <AvatarFallback>
-                        {user.username?.[0]?.toUpperCase() ||
-                          user.emailAddresses[0]?.emailAddress[0]?.toUpperCase()}
+                        {user.name?.[0]?.toUpperCase() ||
+                          user.email[0]?.toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                     <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate max-w-[200px]">
-                      {user.username || user.emailAddresses[0]?.emailAddress}
+                      {user.name || user.email}
                     </span>
                   </div>
                   <div className="sm:hidden">
                     <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.imageUrl} />
+                      <AvatarImage src="" />
                       <AvatarFallback>
-                        {user.username?.[0]?.toUpperCase() ||
-                          user.emailAddresses[0]?.emailAddress[0]?.toUpperCase()}
+                        {user.name?.[0]?.toUpperCase() ||
+                          user.email[0]?.toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
                   </div>
