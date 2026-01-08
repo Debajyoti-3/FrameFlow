@@ -24,7 +24,6 @@ import { Spinner } from "@/components/ui/spinner";
 import toast from "react-hot-toast";
 import { UploadIcon, DownloadIcon, ImageIcon } from "lucide-react";
 
-
 const socialFormats = {
   "Instagram Square (1:1)": { width: 1080, height: 1080, aspectRatio: "1:1" },
   "Instagram Portrait (4:5)": { width: 1080, height: 1350, aspectRatio: "4:5" },
@@ -246,9 +245,12 @@ export default function page() {
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                     Preview
                   </h3>
-                  <Button onClick={handleDownload}>
-                    <DownloadIcon className="mr-2 h-4 w-4" />
-                    Download Image
+                  <Button
+                    onClick={handleDownload}
+                    className="mr-2 h-11 w-[100px] cursor-pointer"
+                  >
+                    <DownloadIcon />
+                    Download
                   </Button>
                 </div>
                 <div className="relative flex justify-center bg-slate-50 dark:bg-slate-800 rounded-lg p-4 border border-slate-200 dark:border-slate-700">

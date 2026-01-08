@@ -145,7 +145,7 @@ export default function page() {
                   <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100">
                     Preview
                   </h3>
-                  <Button onClick={handleDownload} className="mr-2 h-12 w-full cursor-pointer">
+                  <Button onClick={handleDownload} className="mr-2 h-11 w-[100px] cursor-pointer">
                     <DownloadIcon/>
                     Download 
                   </Button>
