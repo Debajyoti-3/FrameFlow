@@ -1,9 +1,11 @@
+export const runtime = "nodejs";
+
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@/app/generated/prisma/client";
+import { prisma } from "@/lib/prisma"
 import bcrypt from "bcrypt";
 
-const prisma = new PrismaClient();
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -53,7 +55,5 @@ export async function POST(req: NextRequest) {
     console.log("error in login: ", error);
     return NextResponse.json({ message: "error in login" });
 
-  } finally {
-    await prisma.$disconnect();
-  }
+  } 
 }

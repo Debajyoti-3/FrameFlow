@@ -1,8 +1,9 @@
-import { PrismaClient } from "@/app/generated/prisma/client";
+export const runtime = "nodejs";
+
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
+import { prisma } from "@/lib/prisma";
 
-const prisma = new PrismaClient();
 
 export async function POST(req: NextRequest) {
   try {
@@ -39,7 +40,5 @@ export async function POST(req: NextRequest) {
   } catch (error) {
     console.log("Signup failed: ", error)
     return NextResponse.json({ message: "Error in signup" }, { status: 500 });
-  } finally {
-    await prisma.$disconnect();
-  }
+  } 
 }

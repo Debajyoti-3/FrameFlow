@@ -1,8 +1,9 @@
+export const runtime = "nodejs";
+
 import { NextResponse, NextRequest } from "next/server";
 import jwt from "jsonwebtoken";
-import { PrismaClient } from "@/app/generated/prisma/client";
+import {prisma} from "@/lib/prisma"
 
-const prisma = new PrismaClient();
 
 export async function GET(req: NextRequest) {
   try {
@@ -54,7 +55,5 @@ export async function GET(req: NextRequest) {
       { message: "Internal server error" },
       { status: 500 }
     );
-  } finally {
-    await prisma.$disconnect();
-  }
+  } 
 }
