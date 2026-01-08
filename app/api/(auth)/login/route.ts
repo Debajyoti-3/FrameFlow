@@ -2,10 +2,8 @@ export const runtime = "nodejs";
 
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
-import { prisma } from "@/lib/prisma"
+import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
-
-
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,7 +11,10 @@ export async function POST(req: NextRequest) {
     const { email, password } = reqBody;
 
     if (!email || !password) {
-      return NextResponse.json({ message: "required fields are empty" }, { status: 400 });
+      return NextResponse.json(
+        { message: "required fields are empty" },
+        { status: 400 }
+      );
     }
     const user = await prisma.user.findFirst({
       where: {
@@ -22,18 +23,25 @@ export async function POST(req: NextRequest) {
     });
 
     if (!user) {
-      return NextResponse.json({ message: "user is not registered yet" }, { status: 400 });
+      return NextResponse.json(
+        { message: "user is not registered yet" },
+        { status: 400 }
+      );
     }
 
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {
-      return NextResponse.json({ message: "given password is not valid" }, { status: 400 });
+      return NextResponse.json(
+        { message: "given password is not valid" },
+        { status: 400 }
+      );
     }
 
-    const tokenData = { // payload
-        id: user.id,
-        email: email,
-        name: user.name
+    const tokenData = {
+      // payload
+      id: user.id,
+      email: email,
+      name: user.name,
     };
 
     const token = jwt.sign(tokenData, process.env.JWT_SECRET_KEY!, {
@@ -47,13 +55,14 @@ export async function POST(req: NextRequest) {
 
     response.cookies.set("token", token, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
     });
 
     return response;
-
   } catch (error) {
     console.log("error in login: ", error);
     return NextResponse.json({ message: "error in login" });
-
-  } 
+  }
 }
