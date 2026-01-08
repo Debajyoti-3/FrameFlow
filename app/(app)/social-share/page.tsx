@@ -230,7 +230,7 @@ export default function page() {
                     <SelectValue placeholder="Select a format" />
                   </SelectTrigger>
 
-                  <SelectContent>
+                  <SelectContent className="bg-white dark:bg-gray-800">
                     {Object.keys(socialFormats).map((format) => (
                       <SelectItem key={format} value={format}>
                         {format}
