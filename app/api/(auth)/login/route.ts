@@ -58,6 +58,7 @@ export async function POST(req: NextRequest) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
+      maxAge: 60 * 60 * 24  // cookie will expire after 1 day
     });
 
     return response;
