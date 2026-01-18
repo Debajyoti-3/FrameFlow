@@ -12,7 +12,7 @@ function page() {
   const router = useRouter();
   return (
     <div className="relative min-h-screen overflow-hidden bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
-      {/* Background Effect - Top half only */}
+      
       <div className="absolute top-0 left-0 w-full h-[60vh] z-0 pointer-events-auto overflow-hidden">
         <BackgroundRippleEffect rows={15} cols={70} />
       </div>
