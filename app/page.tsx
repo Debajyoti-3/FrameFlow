@@ -6,13 +6,19 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { ImageIcon, VideoIcon, Share2Icon } from "lucide-react";
 import { ModeToggle } from "@/components/theme-toggle";
+import { BackgroundRippleEffect } from "@/components/ui/background-ripple-effect";
 
 function page() {
   const router = useRouter();
   return (
-    <div className="min-h-screen bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
+    <div className="relative min-h-screen overflow-hidden bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
+      {/* Background Effect - Top half only */}
+      <div className="absolute top-0 left-0 w-full h-[60vh] z-0 pointer-events-auto overflow-hidden">
+        <BackgroundRippleEffect rows={15} cols={70} />
+      </div>
+      
       {/* Navbar */}
-      <header className="sticky top-0 z-30 w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
+      <header className="relative z-30 w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
@@ -27,7 +33,7 @@ function page() {
       </header>
 
       {/* Main Content */}
-      <div className="flex flex-col items-center justify-center px-4 py-16">
+      <div className="relative z-10 flex flex-col items-center justify-center px-4 py-16">
       
       <div className="max-w-4xl mx-auto text-center space-y-8">
         <div className="space-y-4">
