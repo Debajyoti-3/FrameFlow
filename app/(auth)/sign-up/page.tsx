@@ -42,11 +42,6 @@ export default function SignUpPage() {
 
       if (response.status === 200 || response.status === 201) {
         toast.success("Account created successfully");
-        try {
-          await axios.post("/api/send-email", formData);
-        } catch (emailError) {
-          console.error("Email sending failed:", emailError);
-        }
         router.push("/sign-in");
       }
     } catch (error: any) {
