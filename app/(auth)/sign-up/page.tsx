@@ -42,6 +42,11 @@ export default function SignUpPage() {
 
       if (response.status === 200 || response.status === 201) {
         toast.success("Account created successfully");
+        try {
+          await axios.post("/api/send-email", formData);
+        } catch (emailError) {
+          console.error("Email sending failed:", emailError);
+        }
         router.push("/sign-in");
       }
     } catch (error: any) {
@@ -61,11 +66,13 @@ export default function SignUpPage() {
         </div>
         <ModeToggle />
       </nav>
-      
+
       <div className="flex flex-1 items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center">Sign Up</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">
+              Sign Up
+            </CardTitle>
             <CardDescription className="text-center">
               Create an account to get started
             </CardDescription>
