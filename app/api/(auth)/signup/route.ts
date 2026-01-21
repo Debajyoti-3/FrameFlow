@@ -3,6 +3,7 @@ export const runtime = "nodejs";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { prisma } from "@/lib/prisma";
+import { sendOnboardingEmail } from "@/lib/sendOnBoardingEmail";
 
 
 export async function POST(req: NextRequest) {
@@ -34,6 +35,8 @@ export async function POST(req: NextRequest) {
         name
       },
     });
+
+    sendOnboardingEmail(email, name); // no await -> Important
 
     return NextResponse.json(newUser, { status: 201 });
 
