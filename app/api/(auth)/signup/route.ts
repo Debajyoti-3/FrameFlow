@@ -3,10 +3,6 @@ export const runtime = "nodejs";
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { prisma } from "@/lib/prisma";
-import { Resend } from 'resend';
-import { EmailTemplate } from '@/components/email-template';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
 
 
 export async function POST(req: NextRequest) {
@@ -39,20 +35,7 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    try {
-      await resend.emails.send({
-        from: 'FrameFlow <onboarding@resend.dev>',
-        to: [email],
-        subject: 'Welcome to FrameFlow',
-        react: EmailTemplate({ firstName: name }),
-      });
-    } catch (emailError) {
-      console.error("Error sending welcome email:", emailError);
-    }
-
-    const { password: _, ...userWithoutPassword } = newUser;
-
-    return NextResponse.json(userWithoutPassword, { status: 201 });
+    return NextResponse.json(newUser, { status: 201 });
 
   } catch (error) {
     console.log("Signup failed: ", error)
