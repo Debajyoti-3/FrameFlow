@@ -38,7 +38,9 @@ export default function SignInPage() {
 
     try {
       const response = await axios.post("/api/login", formData);
-
+      if(response.status === 429){
+        toast.error("Too many requests!")
+      }
       if (response.status === 200) {
         toast.success("Login successful");
         router.push("/");

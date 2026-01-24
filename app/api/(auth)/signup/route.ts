@@ -4,15 +4,27 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { prisma } from "@/lib/prisma";
 import { sendOnboardingEmail } from "@/lib/sendOnBoardingEmail";
-
+import { rateLimiter } from "@/lib/rateLimiter";
 
 export async function POST(req: NextRequest) {
   try {
+    const ip = req.headers.get("x-forwarded-for") ?? "anonymous";
+
+    const { success } = await rateLimiter.limit(ip);
+
+    if (!success) {
+    return NextResponse.json({ error: "Too many requests" },{
+      status: 429,
+    });
+  }
     const reqBody = await req.json();
     const { password, email, name } = reqBody;
 
     if (!password || !email || !name) {
-      return NextResponse.json({ message: "Required fields are empty" }, { status: 400 });
+      return NextResponse.json(
+        { message: "Required fields are empty" },
+        { status: 400 },
+      );
     }
     const user = await prisma.user.findFirst({
       where: {
@@ -20,8 +32,11 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    if(user){
-        return NextResponse.json({message:"user already existed"}, { status: 400 })
+    if (user) {
+      return NextResponse.json(
+        { message: "user already existed" },
+        { status: 400 },
+      );
     }
 
     const saltRounds = 10;
@@ -32,16 +47,21 @@ export async function POST(req: NextRequest) {
       data: {
         email,
         password: hashedPassword,
-        name
+        name,
       },
     });
 
-    sendOnboardingEmail(email, name); // no await -> Important
+    sendOnboardingEmail(email, name); // no 'await' -> Important
 
-    return NextResponse.json(newUser, { status: 201 });
-
+    return NextResponse.json(
+      {
+        message:"User Created successfully",
+        user:{ id: newUser.id, email: newUser.email, name:newUser.name}
+      },
+      { status: 201 }
+    );
   } catch (error) {
-    console.log("Signup failed: ", error)
+    console.log("Signup failed: ", error);
     return NextResponse.json({ message: "Error in signup" }, { status: 500 });
-  } 
+  }
 }

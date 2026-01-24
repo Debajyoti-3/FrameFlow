@@ -40,6 +40,9 @@ export default function SignUpPage() {
     try {
       const response = await axios.post("/api/signup", formData);
 
+      if(response.status === 429){
+        toast.error("Too many requests!")
+      }
       if (response.status === 200 || response.status === 201) {
         toast.success("Account created successfully");
         router.push("/sign-in");

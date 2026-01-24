@@ -2,6 +2,7 @@ import { CheckAuth } from "@/lib/checkAuth";
 import { v2 as cloudinary } from "cloudinary";
 import { NextResponse, NextRequest } from "next/server";
 import sharp from "sharp"; // using sharp for extra image meta-data/type checks
+import { rateLimiter } from "@/lib/rateLimiter";
 
 // Configuration
 cloudinary.config({
@@ -16,7 +17,15 @@ interface CloudinaryUploadResult {
 }
 
 export async function POST(request: NextRequest) {
-  // const { userId } = await auth();
+  const ip = request.headers.get("x-forwarded-for") ?? "anonymous";
+
+  const { success } = await rateLimiter.limit(ip);
+
+  if (!success) {
+    return NextResponse.json({ error: "Too many requests" },{
+      status: 429,
+    });
+  }
 
   const user = await CheckAuth();
   // const userId = user?.id
@@ -24,6 +33,7 @@ export async function POST(request: NextRequest) {
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
@@ -35,9 +45,7 @@ export async function POST(request: NextRequest) {
     const bytes = await file.arrayBuffer(); // creating bytes from the file
     const buffer = Buffer.from(bytes); // creating buffer from bytes (it will be uploaded in cloudinary)
 
-    const processed = await sharp(buffer)
-    .jpeg({ quality: 90 })
-    .toBuffer();
+    const processed = await sharp(buffer).jpeg({ quality: 90 }).toBuffer();
 
     const result = await new Promise<CloudinaryUploadResult>(
       (resolve, reject) => {
@@ -46,10 +54,10 @@ export async function POST(request: NextRequest) {
           (error, result) => {
             if (error) reject(error);
             else resolve(result as CloudinaryUploadResult);
-          }
+          },
         );
         uploadStream.end(processed);
-      }
+      },
     );
 
     return NextResponse.json({ publicId: result.public_id }, { status: 200 });

@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
+import { rateLimiter } from "@/lib/rateLimiter";
 
 export async function POST(req: NextRequest) {
   try {
@@ -13,7 +14,18 @@ export async function POST(req: NextRequest) {
     if (!email || !password) {
       return NextResponse.json(
         { message: "required fields are empty" },
-        { status: 400 }
+        { status: 400 },
+      );
+    }
+
+    const { success } = await rateLimiter.limit(email);
+
+    if (!success) {
+      return NextResponse.json(
+        { error: "Too many requests" },
+        {
+          status: 429,
+        },
       );
     }
     const user = await prisma.user.findFirst({
@@ -25,7 +37,7 @@ export async function POST(req: NextRequest) {
     if (!user) {
       return NextResponse.json(
         { message: "user is not registered yet" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -33,7 +45,7 @@ export async function POST(req: NextRequest) {
     if (!validPassword) {
       return NextResponse.json(
         { message: "given password is not valid" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -50,7 +62,7 @@ export async function POST(req: NextRequest) {
 
     const response = NextResponse.json(
       { message: "login successful" },
-      { status: 200 }
+      { status: 200 },
     );
 
     response.cookies.set("token", token, {
@@ -58,7 +70,7 @@ export async function POST(req: NextRequest) {
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24  // cookie will expire after 1 day
+      maxAge: 60 * 60 * 24, // cookie will expire after 1 day
     });
 
     return response;

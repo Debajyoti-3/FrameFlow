@@ -1,11 +1,10 @@
 export const runtime = "nodejs";
 
-import { prisma } from "@/lib/prisma"
+import { prisma } from "@/lib/prisma";
 import { v2 as cloudinary } from "cloudinary";
 import { NextResponse, NextRequest } from "next/server";
 import { CheckAuth } from "@/lib/checkAuth";
-
-
+import { rateLimiter } from "@/lib/rateLimiter";
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -20,12 +19,20 @@ interface CloudinaryUploadResult {
   [key: string]: any;
 }
 
-
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get("x-forwarded-for") ?? "anonymous";
+
+    const { success } = await rateLimiter.limit(ip);
+
+    if (!success) {
+      return new Response(JSON.stringify({ error: "Too many requests" }), {
+        status: 429,
+      });
+    }
     // const { userId } = await auth();
 
-    const user = await CheckAuth()
+    const user = await CheckAuth();
     // const userId = user?.id
 
     if (!user) {
@@ -65,10 +72,10 @@ export async function POST(request: NextRequest) {
           (error, result) => {
             if (error) reject(error);
             else resolve(result as CloudinaryUploadResult);
-          }
+          },
         );
         uploadStream.end(buffer);
-      }
+      },
     );
 
     const video = await prisma.video.create({
@@ -87,5 +94,4 @@ export async function POST(request: NextRequest) {
     console.log("Video upload failed", error);
     return NextResponse.json({ error: "Video upload failed" }, { status: 500 });
   }
-  
 }
