@@ -28,20 +28,55 @@ export default function SignUpPage() {
     email: "",
     password: "",
   });
+  const [errors, setErrors] = useState({ email: "", password: "" });
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
+    const { id, value } = e.target;
+
+    setFormData((prev) => ({ ...prev, [id]: value }));
+
+    if (id === "email") {
+      setErrors((prev) => ({
+        ...prev,
+        email:
+          value.length === 0
+            ? ""
+            : emailRegex.test(value)
+              ? ""
+              : "Invalid email format",
+      }));
+    }
+
+    if (id === "password") {
+      setErrors((prev) => ({
+        ...prev,
+        password:
+          value.length === 0
+            ? ""
+            : passwordRegex.test(value)
+              ? ""
+              : "Password must be at least 8 characters and include a number",
+      }));
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (errors.email || errors.password) {
+      toast.error("Fix validation errors first");
+      return;
+    }
+
     setLoading(true);
 
     try {
       const response = await axios.post("/api/signup", formData);
 
-      if(response.status === 429){
-        toast.error("Too many requests!")
+      if (response.status === 429) {
+        toast.error("Too many requests!");
       }
       if (response.status === 200 || response.status === 201) {
         toast.success("Account created successfully");
@@ -64,15 +99,18 @@ export default function SignUpPage() {
         </div>
         <ModeToggle />
       </nav>
-      
+
       <div className="flex flex-1 items-center justify-center p-4">
         <Card className="w-full max-w-md">
           <CardHeader>
-            <CardTitle className="text-2xl font-bold text-center">Sign Up</CardTitle>
+            <CardTitle className="text-2xl font-bold text-center">
+              Sign Up
+            </CardTitle>
             <CardDescription className="text-center">
               Create an account to get started
             </CardDescription>
           </CardHeader>
+
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
@@ -86,6 +124,7 @@ export default function SignUpPage() {
                   required
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -95,8 +134,13 @@ export default function SignUpPage() {
                   value={formData.email}
                   onChange={handleChange}
                   required
+                  className={errors.email ? "border-red-500" : ""}
                 />
+                {errors.email && (
+                  <p className="text-sm text-red-500">{errors.email}</p>
+                )}
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
@@ -106,13 +150,15 @@ export default function SignUpPage() {
                     placeholder="Create a password"
                     value={formData.password}
                     onChange={handleChange}
-                    className="pr-10"
                     required
+                    className={`pr-10 ${
+                      errors.password ? "border-red-500" : ""
+                    }`}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground transition-colors"
+                    className="absolute right-3 top-2.5 text-muted-foreground hover:text-foreground"
                   >
                     {showPassword ? (
                       <EyeOff className="h-4 w-4" />
@@ -121,8 +167,16 @@ export default function SignUpPage() {
                     )}
                   </button>
                 </div>
+                {errors.password && (
+                  <p className="text-sm text-red-500">{errors.password}</p>
+                )}
               </div>
-              <Button type="submit" className="w-full" disabled={loading}>
+
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={loading || !!errors.email || !!errors.password}
+              >
                 {loading ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -134,6 +188,7 @@ export default function SignUpPage() {
               </Button>
             </form>
           </CardContent>
+
           <CardFooter className="flex justify-center">
             <p className="text-sm text-muted-foreground">
               Already have an account?{" "}
