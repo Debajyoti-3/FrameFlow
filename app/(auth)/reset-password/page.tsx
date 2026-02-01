@@ -1,188 +1,20 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import axios from "axios";
-import toast from "react-hot-toast";
-import Link from "next/link";
-import {
-  Eye,
-  EyeOff,
-  CheckCircle2,
-  AlertCircle,
-  ArrowLeft,
-} from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Suspense } from "react";
+import ResetPasswordClient from "./ResetPasswordClient";
 import { Spinner } from "@/components/ui/spinner";
 
-export default function ResetPasswordPage() {
-  const searchParams = useSearchParams();
-  const token = searchParams.get("token");
-  const router = useRouter();
-
-  const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
-
-  const [password, setPassword] = useState("");
-  const [confirm, setConfirm] = useState("");
-  const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [success, setSuccess] = useState(false);
-
-  const handleReset = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (password !== confirm) {
-      toast.error("Passwords do not match");
-      return;
-    }
-
-    if (!passwordRegex.test(password)) {
-      toast.error("Password must be at least 8 characters and a number");
-      return;
-    }
-
-    setLoading(true);
-
-    try {
-      await axios.post("/api/reset-password", {
-        token,
-        newPassword: password,
-      });
-
-      setSuccess(true);
-      toast.success("Password reset successful. You can now log in.");
-    } catch {
-      toast.error("Failed to reset password. Please try again.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  if (!token) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50/50 px-4">
-        <Card className="w-full max-w-md shadow-lg border-red-100">
-          <CardHeader className="text-center">
-            <div className="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
-              <AlertCircle className="h-6 w-6 text-red-600" />
-            </div>
-            <CardTitle className="text-xl font-bold text-red-700">
-              Invalid or Expired Link
-            </CardTitle>
-            <CardDescription className="mt-2">
-              The password reset link is invalid or has expired. Please request
-              a new one.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter className="flex justify-center pb-8">
-            <Button asChild>
-              <Link href="/forgot-password">Request New Link</Link>
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
-    );
-  }
-
-  if (success) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50/50 px-4">
-        <Card className="w-full max-w-md shadow-lg border-green-100">
-          <CardHeader className="text-center">
-            <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-              <CheckCircle2 className="h-6 w-6 text-green-600" />
-            </div>
-            <CardTitle className="text-xl font-bold text-green-700">
-              Password Reset Complete
-            </CardTitle>
-            <CardDescription className="mt-2">
-              Your password has been successfully updated. You can now log in
-              with your new password.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter className="flex justify-center pb-8">
-            <Button asChild className="w-full">
-              <Link href="/login">Continue to Login</Link>
-            </Button>
-          </CardFooter>
-        </Card>
-      </div>
-    );
-  }
-
+export default function Page() {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50/50 px-4">
-      <Card className="w-full max-w-md shadow-lg border-gray-200/50">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">
-            Set New Password
-          </CardTitle>
-          <CardDescription className="text-center">
-            Your new password must be different from previously used passwords.
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <form onSubmit={handleReset} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="password">New Password</Label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="••••••••"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="w-full pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
-                >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                </button>
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="confirm">Confirm Password</Label>
-              <Input
-                id="confirm"
-                type={showPassword ? "text" : "password"}
-                placeholder="••••••••"
-                required
-                value={confirm}
-                onChange={(e) => setConfirm(e.target.value)}
-                className="w-full"
-              />
-            </div>
-
-            <Button disabled={loading} className="w-full" type="submit">
-              {loading ? "Resetting Password..." : "Reset Password"}
-            </Button>
-          </form>
-        </CardContent>
-        <CardFooter className="flex justify-center border-t p-4 bg-gray-50/50 rounded-b-xl">
-          <Link
-            href="/login"
-            className="flex items-center text-sm text-gray-500 hover:text-gray-900 transition-colors"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Login
-          </Link>
-        </CardFooter>
-      </Card>
-    </div>
+    <Suspense
+      fallback={
+        <div className="flex items-center justify-center min-h-[60vh] w-full">
+        <div className="flex flex-col items-center gap-4">
+          <Spinner className="size-12 text-slate-900 dark:text-slate-100"/>
+          <p className="text-slate-600 dark:text-slate-400">Loading...</p>
+        </div>
+      </div>
+      }
+    >
+      <ResetPasswordClient />
+    </Suspense>
   );
 }
