@@ -1,0 +1,38 @@
+import crypto from "crypto";
+import { prisma } from "@/lib/prisma";
+import { sendResetEmail } from "@/lib/sendResetEmail";
+
+export async function POST(req: Request) {
+  const { email } = await req.json();
+
+  const user = await prisma.user.findUnique({
+    where: { email }
+  });
+
+  
+  if (!user) {
+    return Response.json({ message: "If user exists, email sent" });
+  }
+
+  const rawToken = crypto.randomBytes(32).toString("hex");
+  const tokenHash = crypto
+    .createHash("sha256")
+    .update(rawToken)
+    .digest("hex");
+
+  await prisma.passwordResetToken.create({
+    data: {
+      tokenHash,
+      userId: user.id,
+      expiresAt: new Date(Date.now() + 10 * 60 * 1000), // 10 minutes validity
+    }
+  });
+
+  const baseUrl = process.env.FRONTEND_URL!
+  
+  const resetLink = `${baseUrl}/reset-password?token=${rawToken}`;
+
+  await sendResetEmail(user.email, resetLink);
+
+  return Response.json({ message: "If user exists, email sent" });
+}

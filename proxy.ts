@@ -9,7 +9,9 @@ export function proxy(req: NextRequest) {
     currentUrl.pathname === "/sign-in" ||
     currentUrl.pathname === "/sign-up" ||
     currentUrl.pathname === "/" ||
-    currentUrl.pathname === "/home";
+    currentUrl.pathname === "/home" ||
+    currentUrl.pathname === "/forgot-password" ||
+    currentUrl.pathname === "/reset-password" ;
 
   const isPublicApiRoute = currentUrl.pathname === "/api/videos";
 
@@ -17,7 +19,11 @@ export function proxy(req: NextRequest) {
     currentUrl.pathname.startsWith("/api/login") ||
     currentUrl.pathname.startsWith("/api/signup") ||
     currentUrl.pathname.startsWith("/api/authcheck") ||
-    currentUrl.pathname.startsWith("/api/logout");
+    currentUrl.pathname.startsWith("/api/logout") ||
+    currentUrl.pathname.startsWith("/api/forgot-password") ||
+    currentUrl.pathname.startsWith("/api/reset-password") ;
+    
+
 
   const isAccessingDashboard = currentUrl.pathname === "/dashboard";
   const isAccessingHome = currentUrl.pathname === "/";

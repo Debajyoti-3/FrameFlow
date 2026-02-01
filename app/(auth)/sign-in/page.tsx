@@ -88,6 +88,12 @@ export default function SignInPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label htmlFor="password">Password</Label>
+                  <span
+                    onClick={() => router.push("/forgot-password")}
+                    className="text-sm font-medium text-primary hover:underline cursor-pointer"
+                  >
+                    Forgot password?
+                  </span>
                 </div>
                 <div className="relative">
                   <Input
