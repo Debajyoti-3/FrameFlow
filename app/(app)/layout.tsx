@@ -24,7 +24,8 @@ const sidebarItems = [
   { href: "/dashboard", icon: LayoutDashboardIcon, label: "Dashboard" },
   { href: "/social-share", icon: Share2Icon, label: "Social Share" },
   { href: "/video-upload", icon: UploadIcon, label: "Video Upload" },
-  { href: "/remove-bg", icon: Eraser, label: "bg-Remove" },
+  { href: "/remove-bg", icon: Eraser, label: "BG-Remove" },
+  { href: "/bg-change", icon: Eraser, label: "BG-Change" },
 ];
 
 interface User {
