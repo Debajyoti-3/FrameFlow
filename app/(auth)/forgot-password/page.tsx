@@ -98,10 +98,10 @@ export default function page() {
             </Button>
           </form>
         </CardContent>
-        <CardFooter className="flex justify-center border-t p-4 bg-gray-50/50 rounded-b-xl">
+        <CardFooter className="flex justify-center border-t p-4 rounded-b-xl">
           <Link
             href="/login"
-            className="flex items-center text-sm text-gray-500 hover:text-gray-900 transition-colors"
+            className="flex items-center text-sm text-gray-500 transition-colors"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
             Back to Login
