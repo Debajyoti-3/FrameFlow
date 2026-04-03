@@ -1,7 +1,8 @@
 import { NextResponse, NextRequest } from "next/server";
 
 export function proxy(req: NextRequest) {
-  const token = req.cookies.get("token")?.value || "";
+  const accessToken = req.cookies.get("accessToken")?.value || "";
+  const refreshToken = req.cookies.get("refreshToken")?.value || "";
 
   const currentUrl = new URL(req.url);
 
@@ -9,9 +10,8 @@ export function proxy(req: NextRequest) {
     currentUrl.pathname === "/sign-in" ||
     currentUrl.pathname === "/sign-up" ||
     currentUrl.pathname === "/" ||
-    currentUrl.pathname === "/home" ||
     currentUrl.pathname === "/forgot-password" ||
-    currentUrl.pathname === "/reset-password" ;
+    currentUrl.pathname === "/reset-password";
 
   const isPublicApiRoute = currentUrl.pathname === "/api/videos";
 
@@ -21,9 +21,8 @@ export function proxy(req: NextRequest) {
     currentUrl.pathname.startsWith("/api/authcheck") ||
     currentUrl.pathname.startsWith("/api/logout") ||
     currentUrl.pathname.startsWith("/api/forgot-password") ||
-    currentUrl.pathname.startsWith("/api/reset-password") ;
-    
-
+    currentUrl.pathname.startsWith("/api/reset-password") ||
+    currentUrl.pathname.startsWith("/api/refresh-token");
 
   const isAccessingDashboard = currentUrl.pathname === "/dashboard";
   const isAccessingHome = currentUrl.pathname === "/";
@@ -31,20 +30,25 @@ export function proxy(req: NextRequest) {
   const isApiRequest = currentUrl.pathname.startsWith("/api");
 
   if (
-    token &&
+    accessToken &&
     (currentUrl.pathname === "/sign-in" || currentUrl.pathname === "/sign-up")
   ) {
-    return NextResponse.redirect(new URL("/", req.nextUrl));
+    return NextResponse.redirect(new URL("/dashboard", req.nextUrl));
   }
 
-  // If user is not loggedin
-  if (!token) {
-    if (!isPublicRoute && !isPublicApiRoute && !isAuthApiRoute) {
-      if (isApiRequest) {
-        return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+  // If user has not valid access token
+  if (!accessToken) {
+    if (!refreshToken) {
+      if (!isPublicRoute && !isAuthApiRoute && !isPublicApiRoute) {
+        return NextResponse.redirect(new URL("/sign-in", req.nextUrl));
       }
+      return NextResponse.next();
+    }
+    if (!isApiRequest && !isPublicRoute && !isPublicApiRoute && !isAuthApiRoute ) {
+      const refreshUrl = new URL("/api/refresh-token", req.nextUrl);
+      refreshUrl.searchParams.set("redirect", currentUrl.pathname);
 
-      return NextResponse.redirect(new URL("/sign-in", req.nextUrl));
+      return NextResponse.redirect(refreshUrl);
     }
   }
 
