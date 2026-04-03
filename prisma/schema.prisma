@@ -11,7 +11,6 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
 
 model Video {
@@ -33,6 +32,7 @@ model User {
   name String?
   createdAt DateTime @default(now())
   resetTokens PasswordResetToken[]
+  refreshToken RefreshToken[]
 }
 
 model PasswordResetToken {
@@ -47,5 +47,16 @@ model PasswordResetToken {
   createdAt DateTime @default(now())
 
   @@index([userId])
+}
+
+model RefreshToken {
+  id String @id @default(cuid())
+  hashedToken String  @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  revoked Boolean @default(false)
+
+  userId String
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade) // 'fields' for foreign-key and 'references' for primary key (in foreign)
 }
 

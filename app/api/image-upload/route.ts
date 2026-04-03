@@ -17,15 +17,15 @@ interface CloudinaryUploadResult {
 }
 
 export async function POST(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for") ?? "anonymous";
+  // const ip = request.headers.get("x-forwarded-for") ?? "anonymous";
 
-  const { success } = await rateLimiter.limit(ip);
+  // const { success } = await rateLimiter.limit(ip);
 
-  if (!success) {
-    return NextResponse.json({ error: "Too many requests" },{
-      status: 429,
-    });
-  }
+  // if (!success) {
+  //   return NextResponse.json({ error: "Too many requests" },{
+  //     status: 429,
+  //   });
+  // }
 
   const user = await CheckAuth();
   // const userId = user?.id

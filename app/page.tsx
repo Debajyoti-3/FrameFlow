@@ -55,7 +55,7 @@ function page() {
           <Button
             size="lg"
             onClick={() => router.push("/social-share")}
-            className="text-base px-8 py-6"
+            className="text-base px-8 py-6 rounded-2xl cursor-pointer"
           >
             <Share2Icon className="mr-2 h-5 w-5" />
             Start Here
@@ -64,7 +64,7 @@ function page() {
             variant="outline"
             size="lg"
             onClick={() => router.push("/dashboard")}
-            className="text-base px-8 py-6"
+            className="text-base px-8 py-6 rounded-2xl cursor-pointer"
           >
             <VideoIcon className="mr-2 h-5 w-5" />
             View Dashboard

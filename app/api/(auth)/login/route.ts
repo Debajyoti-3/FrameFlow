@@ -18,16 +18,16 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { success } = await rateLimiter.limit(email);
+    // const { success } = await rateLimiter.limit(email);
 
-    if (!success) {
-      return NextResponse.json(
-        { error: "Too many requests" },
-        {
-          status: 429,
-        },
-      );
-    }
+    // if (!success) {
+    //   return NextResponse.json(
+    //     { error: "Too many requests" },
+    //     {
+    //       status: 429,
+    //     },
+    //   );
+    // }
     const user = await prisma.user.findFirst({
       where: {
         email: email,
@@ -56,21 +56,58 @@ export async function POST(req: NextRequest) {
       name: user.name,
     };
 
-    const token = jwt.sign(tokenData, process.env.JWT_SECRET_KEY!, {
-      expiresIn: "1d",
+    const secretA = process.env.ACCESS_TOKEN_SECRET_KEY;
+    const expiryA = process.env.ACCESS_TOKEN_EXPIRY;
+
+    const secretR = process.env.REFRESH_TOKEN_SECRET_KEY;
+    const expiryR = process.env.REFRESH_TOKEN_EXPIRY;
+
+    // doing this to prevent Typescript issues
+    if (!secretA || !expiryA || !secretR || !expiryR) {
+      throw new Error("JWT Configuration is incomplete in .env");
+    }
+    const generatedAccessToken = jwt.sign({ ...tokenData }, secretA, {
+      expiresIn: expiryA as any,
     });
 
+    const generatedRefreshToken = jwt.sign({ id: user.id }, secretR, {
+      expiresIn: expiryR as any,
+    });
+
+    const salt = await bcrypt.genSalt(10);
+    const hashedToken = await bcrypt.hash(generatedRefreshToken, salt);
+
+    // delete old refresh tokens before creating new token
+    await prisma.refreshToken.deleteMany({
+      where: { userId: user.id },
+    });
+    
+    await prisma.refreshToken.create({
+      data: {
+        hashedToken,
+        userId: user.id,
+        expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days validity
+      },
+    });
     const response = NextResponse.json(
       { message: "login successful" },
       { status: 200 },
     );
 
-    response.cookies.set("token", token, {
+    response.cookies.set("accessToken", generatedAccessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24, // cookie will expire after 1 day
+      maxAge: 60 * 60, // cookie will expire after 1 hr
+    });
+
+    response.cookies.set("refreshToken", generatedRefreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: 60 * 60 * 24 * 7, // cookie will expire after 7 days
     });
 
     return response;

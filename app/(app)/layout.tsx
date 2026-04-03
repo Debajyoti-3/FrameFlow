@@ -65,7 +65,7 @@ export default function AppLayout({
     };
 
     checkAuth();
-  }, [router]);
+  }, []);
 
   const handleLogoClick = () => {
     router.push("/");
@@ -192,7 +192,7 @@ export default function AppLayout({
                         <AvatarImage src="" />
                         <AvatarFallback>
                           {user.name?.[0]?.toUpperCase() ||
-                            user.email[0]?.toUpperCase()}
+                            user.email?.[0]?.toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                       <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate max-w-[200px]">
@@ -206,7 +206,7 @@ export default function AppLayout({
                         <AvatarImage src="" />
                         <AvatarFallback>
                           {user.name?.[0]?.toUpperCase() ||
-                            user.email[0]?.toUpperCase()}
+                            user.email?.[0]?.toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
                     </div>
