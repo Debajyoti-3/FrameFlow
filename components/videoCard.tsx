@@ -7,7 +7,7 @@ import relativeTime from "dayjs/plugin/relativeTime.js";
 import { filesize } from "filesize";
 import { FileDown, FileUp, Download, Clock } from "lucide-react";
 import { CldVideoPlayer } from "next-cloudinary";
-import "next-cloudinary/dist/cld-video-player.css";
+// import "next-cloudinary/dist/cld-video-player.css";
 
 // @ts-ignore - dayjs extend method
 dayjs.extend(relativeTime);
@@ -140,7 +140,7 @@ const VideoCard: React.FC<VideoCardProps> = ({ video, onDownload }) => {
         </div>
       </div>
       <CardContent className="p-5">
-        <h3 className="font-semibold text-lg text-slate-900 mb-2 line-clamp-1">
+        <h3 className="font-semibold text-lg text-slate-900 dark:text-white mb-2 line-clamp-1">
           {video.title}
         </h3>
         {video.description && (
