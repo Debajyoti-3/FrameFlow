@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import React, { useCallback, useState, useEffect } from "react";
 import dayjs from "dayjs";
@@ -7,7 +7,7 @@ import relativeTime from "dayjs/plugin/relativeTime.js";
 import { filesize } from "filesize";
 import { FileDown, FileUp, Download, Clock } from "lucide-react";
 import { CldVideoPlayer } from "next-cloudinary";
-// import "next-cloudinary/dist/cld-video-player.css";
+import "next-cloudinary/dist/cld-video-player.css";
 
 // @ts-ignore - dayjs extend method
 dayjs.extend(relativeTime);

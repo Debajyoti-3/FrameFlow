@@ -1,0 +1,1 @@
+declare module 'next-cloudinary/dist/cld-video-player.css';
