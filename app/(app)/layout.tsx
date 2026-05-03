@@ -15,6 +15,7 @@ import {
   ImageIcon,
   XIcon,
   Eraser,
+  Wand2,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -26,6 +27,7 @@ const sidebarItems = [
   { href: "/video-upload", icon: UploadIcon, label: "Video Upload" },
   { href: "/remove-bg", icon: Eraser, label: "BG-Remove" },
   { href: "/bg-change", icon: Eraser, label: "BG-Change" },
+  { href: "/smart-enhance", icon: Wand2, label: "Smart Enhance" },
 ];
 
 interface User {
