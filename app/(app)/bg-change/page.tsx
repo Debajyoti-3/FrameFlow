@@ -14,7 +14,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { UploadIcon, DownloadIcon, ImageIcon } from "lucide-react";
 
 const FILE_MAX_SIZE = 10 * 1024 * 1024;

@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { Trash2, User, Mail, AlertTriangle } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";

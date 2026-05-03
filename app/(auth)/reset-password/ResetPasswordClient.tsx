@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import axios from "axios";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import Link from "next/link";
 import {
   Eye,

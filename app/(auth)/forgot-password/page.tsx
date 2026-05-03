@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import axios from "axios";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import Link from "next/link";
 import { ArrowLeft, Mail } from "lucide-react";
 import { Input } from "@/components/ui/input";

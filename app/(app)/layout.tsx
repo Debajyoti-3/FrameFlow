@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import axios from "axios";
 import { ModeToggle } from "@/components/theme-toggle";
 import {

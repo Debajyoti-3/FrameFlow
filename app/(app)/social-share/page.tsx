@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 import { UploadIcon, DownloadIcon, ImageIcon } from "lucide-react";
 
 const socialFormats = {

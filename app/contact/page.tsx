@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/card";
 import { Mail, Phone, MapPin, Send, ChevronLeft } from "lucide-react";
 import Link from "next/link";
-import toast from "react-hot-toast";
+import { toast } from "sonner";
 
 export default function ContactPage() {
   const handleSend = (e: React.MouseEvent<HTMLButtonElement>): void => {
