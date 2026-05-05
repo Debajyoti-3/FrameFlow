@@ -29,7 +29,6 @@ export default function ResetPasswordClient() {
   const token = searchParams.get("token");
 
   const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
-
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
@@ -68,111 +67,133 @@ export default function ResetPasswordClient() {
 
   if (!token) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50/50 px-4">
-        <Card className="w-full max-w-md shadow-lg border-red-100">
-          <CardHeader className="text-center">
-            <div className="mx-auto w-12 h-12 bg-red-100 rounded-full flex items-center justify-center mb-4">
-              <AlertCircle className="h-6 w-6 text-red-600" />
+      <div className="flex w-full items-center justify-center p-4">
+        <div className="w-full max-w-[400px] space-y-8">
+          <div className="flex flex-col items-center space-y-2 text-center">
+            <div className="mx-auto w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center mb-2">
+              <AlertCircle className="h-6 w-6 text-red-600 dark:text-red-400" />
             </div>
-            <CardTitle className="text-xl font-bold text-red-700">
+            <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
               Invalid or Expired Link
-            </CardTitle>
-            <CardDescription className="mt-2">
+            </h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               The password reset link is invalid or has expired.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter className="flex justify-center pb-8">
-            <Button asChild>
+            </p>
+          </div>
+          
+          <div className="pt-4">
+            <Button 
+              asChild 
+              className="w-full h-11 rounded-xl  text-white font-medium shadow-sm transition-all"
+            >
               <Link href="/forgot-password">Request New Link</Link>
             </Button>
-          </CardFooter>
-        </Card>
+          </div>
+        </div>
       </div>
     );
   }
 
   if (success) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50/50 px-4">
-        <Card className="w-full max-w-md shadow-lg border-green-100">
-          <CardHeader className="text-center">
-            <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-              <CheckCircle2 className="h-6 w-6 text-green-600" />
+      <div className="flex w-full items-center justify-center p-4">
+        <div className="w-full max-w-[400px] space-y-8">
+          <div className="flex flex-col items-center space-y-2 text-center">
+            <div className="mx-auto w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-2">
+              <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
-            <CardTitle className="text-xl font-bold text-green-700">
+            <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
               Password Reset Complete
-            </CardTitle>
-            <CardDescription className="mt-2">
+            </h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
               Your password has been successfully updated.
-            </CardDescription>
-          </CardHeader>
-          <CardFooter className="flex justify-center pb-8">
-            <Button asChild className="w-full">
-              <Link href="/login">Continue to Login</Link>
+            </p>
+          </div>
+          
+          <div className="pt-4">
+            <Button 
+              asChild 
+              className="w-full h-11 rounded-xl bg-[#849aef] hover:bg-[#6e85e5] text-white font-medium shadow-sm transition-all"
+            >
+              <Link href="/sign-in">Continue to Sign In</Link>
             </Button>
-          </CardFooter>
-        </Card>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50/50 px-4">
-      <Card className="w-full max-w-md shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl text-center">
-            Set New Password
-          </CardTitle>
-          <CardDescription className="text-center">
-            Choose a strong password
-          </CardDescription>
-        </CardHeader>
+    <div className="flex w-full items-center justify-center p-4">
+      <div className="w-full max-w-[400px] space-y-8">
+        <div className="flex flex-col items-center space-y-2 text-center">
+          <div className="flex items-center gap-1 mb-2">
+            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+              FrameFlow<span className="text-blue-500">.</span>
+            </h1>
+          </div>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Choose a new strong password
+          </p>
+        </div>
 
-        <CardContent>
+        <div className="space-y-6">
           <form onSubmit={handleReset} className="space-y-4">
-            <div>
-              <Label>New Password</Label>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-slate-700 dark:text-slate-300 ml-1">New Password</Label>
               <div className="relative">
                 <Input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  className="h-11 rounded-xl pr-10 bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                  placeholder="Enter new password"
+                  required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2"
+                  className="absolute right-3 top-3 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
                 >
-                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
 
-            <div>
-              <Label>Confirm Password</Label>
+            <div className="space-y-1.5">
+              <Label className="text-xs font-semibold text-slate-700 dark:text-slate-300 ml-1">Confirm Password</Label>
               <Input
                 type={showPassword ? "text" : "password"}
                 value={confirm}
                 onChange={(e) => setConfirm(e.target.value)}
+                className="h-11 rounded-xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
+                placeholder="Confirm new password"
+                required
               />
             </div>
 
-            <Button disabled={loading} className="w-full">
-              {loading ? "Resetting..." : "Reset Password"}
-            </Button>
+            <div className="pt-2">
+              <Button 
+                type="submit" 
+                className="w-full h-11 rounded-xl dark:text-black text-white font-medium shadow-sm transition-all" 
+                disabled={loading}
+              >
+                {loading ? "Resetting..." : "Reset Password"}
+              </Button>
+            </div>
           </form>
-        </CardContent>
 
-        <CardFooter className="justify-center">
-          <Link
-            href="/login"
-            className="flex items-center text-sm text-gray-500"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to login
-          </Link>
-        </CardFooter>
-      </Card>
+          <p className="text-center text-sm text-slate-500 dark:text-slate-400">
+            <Link 
+              href="/sign-in" 
+              className="inline-flex items-center font-medium text-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Sign In
+            </Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

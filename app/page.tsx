@@ -12,18 +12,18 @@ function page() {
   const router = useRouter();
   return (
     <div className="relative min-h-screen overflow-hidden bg-linear-to-br from-slate-50 to-slate-100 dark:from-slate-950 dark:to-slate-900">
-      
       <div className="absolute top-0 left-0 w-full h-[60vh] z-0 pointer-events-auto overflow-hidden">
         <BackgroundRippleEffect rows={15} cols={70} />
       </div>
-      
+
       {/* Navbar */}
       <header className="relative z-30 w-full border-b border-slate-200 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex h-16 items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
-              <ImageIcon className="w-8 h-8 text-slate-900 dark:text-slate-100" />
-              <span className="text-xl font-bold text-slate-900 dark:text-slate-100">FrameFlow</span>
+              <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
+                FrameFlow<span className="text-blue-500">.</span>
+              </h1>
             </Link>
             <div className="flex items-center gap-4">
               <ModeToggle />
@@ -34,42 +34,37 @@ function page() {
 
       {/* Main Content */}
       <div className="relative z-10 flex flex-col items-center justify-center px-4 py-16">
-      
-      <div className="max-w-4xl mx-auto text-center space-y-8">
-        <div className="space-y-4">
-          <div className="flex justify-center">
-            <div className="p-4 bg-slate-900 dark:bg-slate-100 rounded-2xl">
-              <ImageIcon className="w-12 h-12 text-white dark:text-slate-900" />
-            </div>
+        <div className="max-w-4xl mx-auto text-center space-y-8">
+          <div className="space-y-4">
+            <div className="flex justify-center"></div>
+            <h1 className="text-5xl md:text-7xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
+              Welcome to FrameFlow
+            </h1>
+            <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
+              Transform your media with powerful video and image tools of
+              FrameFlow
+            </p>
           </div>
-          <h1 className="text-5xl md:text-7xl font-bold text-slate-900 dark:text-slate-100 tracking-tight">
-            Welcome to FrameFlow
-          </h1>
-          <p className="text-xl md:text-2xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
-            Transform your media with powerful video and image tools of FrameFlow
-             
-          </p>
-        </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-          <Button
-            size="lg"
-            onClick={() => router.push("/smart-enhance")}
-            className="text-base px-8 py-6 rounded-2xl cursor-pointer"
-          >
-            <Share2Icon className="mr-2 h-5 w-5" />
-            Start Here
-          </Button>
-          <Button
-            variant="outline"
-            size="lg"
-            onClick={() => router.push("/dashboard")}
-            className="text-base px-8 py-6 rounded-2xl cursor-pointer"
-          >
-            <VideoIcon className="mr-2 h-5 w-5" />
-            View Dashboard
-          </Button>
-        </div>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+            <Button
+              size="lg"
+              onClick={() => router.push("/smart-enhance")}
+              className="text-base px-8 py-6 rounded-2xl cursor-pointer"
+            >
+              <Share2Icon className="mr-2 h-5 w-5" />
+              Start Here
+            </Button>
+            <Button
+              variant="outline"
+              size="lg"
+              onClick={() => router.push("/dashboard")}
+              className="text-base px-8 py-6 rounded-2xl cursor-pointer"
+            >
+              <VideoIcon className="mr-2 h-5 w-5" />
+              View Dashboard
+            </Button>
+          </div>
         </div>
       </div>
     </div>

@@ -11,7 +11,10 @@ export function proxy(req: NextRequest) {
     currentUrl.pathname === "/sign-up" ||
     currentUrl.pathname === "/" ||
     currentUrl.pathname === "/forgot-password" ||
+    currentUrl.pathname === "/legal" ||
     currentUrl.pathname === "/reset-password";
+    
+
 
   const isPublicApiRoute = currentUrl.pathname === "/api/videos";
 

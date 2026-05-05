@@ -28,7 +28,9 @@ export async function POST(req: Request) {
     }
   });
 
-  const baseUrl = process.env.FRONTEND_URL!
+  const protocol = process.env.NODE_ENV === "development" ? "http" : "https";
+  const host = req.headers.get("host") || "localhost:3000";
+  const baseUrl = `${protocol}://${host}`;
   
   const resetLink = `${baseUrl}/reset-password?token=${rawToken}`;
 

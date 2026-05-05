@@ -32,82 +32,101 @@ export default function page() {
 
   if (submitted) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50/50 px-4">
-        <Card className="w-full max-w-md shadow-lg border-gray-200/50">
-          <CardHeader className="text-center">
-            <div className="mx-auto w-12 h-12 bg-green-100 rounded-full flex items-center justify-center mb-4">
-              <Mail className="h-6 w-6 text-green-600" />
+      <div className="flex w-full items-center justify-center p-4">
+        <div className="w-full max-w-[400px] space-y-8">
+          <div className="flex flex-col items-center space-y-2 text-center">
+            <div className="mx-auto w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-2">
+              <Mail className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
-            <CardTitle className="text-2xl font-bold">Check your email</CardTitle>
-            <CardDescription className="text-gray-500 mt-2">
-              We've sent a password reset link to <span className="font-medium text-gray-900">{email}</span>.
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="text-center space-y-4">
-            <p className="text-sm text-gray-500">
-              Didn't receive the email? Check your spam filter or{" "}
-              <button
-                type="button"
-                onClick={() => setSubmitted(false)}
-                className="text-black font-semibold hover:underline bg-transparent border-none p-0 cursor-pointer"
-              >
-                try another email address
-              </button>
-              .
+            <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-white">
+              Check your email
+            </h1>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              We've sent a password reset link to <span className="font-medium text-slate-900 dark:text-white">{email}</span>.
             </p>
-          </CardContent>
-          <CardFooter className="flex justify-center">
-            <Button variant="outline" asChild className="w-full">
-              <Link href="/login">Return to Login</Link>
-            </Button>
-          </CardFooter>
-        </Card>
+          </div>
+          
+          <div className="space-y-6">
+            <div className="text-center text-sm text-slate-500 dark:text-slate-400">
+              <p>
+                Didn't receive the email? Check your spam filter or{" "}
+                <button
+                  type="button"
+                  onClick={() => setSubmitted(false)}
+                  className="font-medium text-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors bg-transparent border-none p-0 cursor-pointer"
+                >
+                  try another email address
+                </button>
+                .
+              </p>
+            </div>
+            
+            <div className="pt-2">
+              <Button 
+                variant="outline" 
+                asChild 
+                className="w-full h-11 rounded-xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 shadow-sm"
+              >
+                <Link href="/sign-in">Return to Sign In</Link>
+              </Button>
+            </div>
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50/50 px-4">
-      <Card className="w-full max-w-md shadow-lg border-gray-200/50">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">Forgot Password</CardTitle>
-          <CardDescription className="text-center">
-            Enter your email and we'll send you a reset link
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
+    <div className="flex w-full items-center justify-center p-4">
+      <div className="w-full max-w-[400px] space-y-8">
+        <div className="flex flex-col items-center space-y-2 text-center">
+          <div className="flex items-center gap-1 mb-2">
+            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white">
+              FrameFlow<span className="text-blue-500">.</span>
+            </h1>
+          </div>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
+            Enter your email to receive a reset link
+          </p>
+        </div>
+
+        <div className="space-y-6">
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="email">Email address</Label>
+            <div className="space-y-1.5">
+              <Label htmlFor="email" className="text-xs font-semibold text-slate-700 dark:text-slate-300 ml-1">Email address</Label>
               <Input
                 id="email"
                 type="email"
-                placeholder="name@example.com"
-                required
+                placeholder="you@example.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full"
+                required
+                className="h-11 rounded-xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
               />
             </div>
-            <Button
-              disabled={loading}
-              className="w-full"
-              type="submit"
-            >
-              {loading ? "Sending link..." : "Send Reset Link"}
-            </Button>
+            
+            <div className="pt-2">
+              <Button 
+                type="submit" 
+                className="w-full h-11 rounded-xl text-slate-900 dark:text-slate-100 text-white dark:text-black font-medium shadow-sm transition-all" 
+                disabled={loading}
+              >
+                {loading ? "Sending link..." : "Send Reset Link"}
+              </Button>
+            </div>
           </form>
-        </CardContent>
-        <CardFooter className="flex justify-center border-t p-4 rounded-b-xl">
-          <Link
-            href="/login"
-            className="flex items-center text-sm text-gray-500 transition-colors"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Back to Login
-          </Link>
-        </CardFooter>
-      </Card>
+
+          <p className="text-center text-sm text-slate-500 dark:text-slate-400">
+            <Link 
+              href="/sign-in" 
+              className="inline-flex items-center font-medium text-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >
+              <ArrowLeft className="mr-2 h-4 w-4" />
+              Back to Sign In
+            </Link>
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
