@@ -4,7 +4,6 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
-import { rateLimiter } from "@/lib/rateLimiter";
 
 export async function POST(req: NextRequest) {
   try {
@@ -18,16 +17,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // const { success } = await rateLimiter.limit(email);
-
-    // if (!success) {
-    //   return NextResponse.json(
-    //     { error: "Too many requests" },
-    //     {
-    //       status: 429,
-    //     },
-    //   );
-    // }
     const user = await prisma.user.findFirst({
       where: {
         email: email,
@@ -81,7 +70,7 @@ export async function POST(req: NextRequest) {
     await prisma.refreshToken.deleteMany({
       where: { userId: user.id },
     });
-    
+
     await prisma.refreshToken.create({
       data: {
         hashedToken,
