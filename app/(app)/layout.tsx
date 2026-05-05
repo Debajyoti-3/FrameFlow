@@ -30,11 +30,6 @@ const sidebarItems = [
   { href: "/smart-enhance", icon: Wand2, label: "Smart Enhance" },
 ];
 
-interface User {
-  id: string;
-  email: string;
-  name: string | null;
-}
 
 export default function AppLayout({
   children,
@@ -42,7 +37,7 @@ export default function AppLayout({
   children: React.ReactNode;
 }>) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUser] = useState<{name?: string, email?: string, profilePic?: string} | null>(null);
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
   const router = useRouter();
@@ -50,8 +45,8 @@ export default function AppLayout({
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        const response = await axios.get("/api/authcheck");
-        if (response.data.success) {
+        const response = await axios.get("/api/profile");
+        if (response.data.user) {
           setUser(response.data.user);
         } else {
           setUser(null);
@@ -191,10 +186,17 @@ export default function AppLayout({
                   <Link href="/profile-page">
                     <div className="hidden sm:flex items-center gap-3">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src="" />
+                        {user.profilePic ? (
+                          <AvatarImage 
+                            src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_fill,g_face,w_100,h_100,r_max/${user.profilePic}`} 
+                            alt="Profile" 
+                          />
+                        ) : (
+                          <AvatarImage src="/avatar.png" alt="Profile" />
+                        )}
                         <AvatarFallback>
                           {user.name?.[0]?.toUpperCase() ||
-                            user.email?.[0]?.toUpperCase()}
+                            user.email?.[0]?.toUpperCase() || "U"}
                         </AvatarFallback>
                       </Avatar>
                       <span className="text-sm font-medium text-slate-700 dark:text-slate-300 truncate max-w-[200px]">
@@ -205,10 +207,17 @@ export default function AppLayout({
                   <Link href="/profile-page">
                     <div className="sm:hidden">
                       <Avatar className="h-8 w-8">
-                        <AvatarImage src="" />
+                        {user.profilePic ? (
+                          <AvatarImage 
+                            src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_fill,g_face,w_100,h_100,r_max/${user.profilePic}`} 
+                            alt="Profile" 
+                          />
+                        ) : (
+                          <AvatarImage src="/avatar.png" alt="Profile" />
+                        )}
                         <AvatarFallback>
                           {user.name?.[0]?.toUpperCase() ||
-                            user.email?.[0]?.toUpperCase()}
+                            user.email?.[0]?.toUpperCase() || "U"}
                         </AvatarFallback>
                       </Avatar>
                     </div>
@@ -224,7 +233,7 @@ export default function AppLayout({
                 </>
               )}
             </div>
-            <div className="cursor-pointer">
+            <div className="cursor-pointer mx-3">
               <ModeToggle />
             </div>
           </div>

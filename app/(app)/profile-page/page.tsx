@@ -23,9 +23,12 @@ export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState<string>("");
   const [name, setName] = useState<string>("");
+  const [profilePic, setProfilePic] = useState<string | null>(null);
   const [showDeletePrompt, setShowDeletePrompt] = useState(false);
   const [confirmationText, setConfirmationText] = useState("");
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const fileInputRef = React.useRef<HTMLInputElement>(null);
 
   const router = useRouter();
 
@@ -47,6 +50,43 @@ export default function ProfilePage() {
     }
   };
 
+  
+
+  const handleProfileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+
+    if (!file) return;
+
+    if (file.size > 10 * 1024 * 1024) {
+      toast.error("File size must be within 10 MB");
+      return;
+    }
+
+    setIsUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+
+    try {
+      // Using the correct endpoint, fixing typo from "image-upaload" to "image-upload"
+      const res = await axios.post("/api/profile-update", formData);
+      if (res.data.publicId) {
+        setProfilePic(res.data.publicId);
+        toast.success("Profile image uploaded successfully");
+      }
+    } catch (error) {
+      console.log("Image upload failed", error);
+      toast.error("Failed to upload profile image");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleAvatarClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
+
   useEffect(() => {
     const fetchProfile = async () => {
       try {
@@ -54,6 +94,14 @@ export default function ProfilePage() {
         
         setEmail(res.data.user?.email || "");
         setName(res.data.user?.name || "");
+        
+        console.log("profile email: ", email); 
+        if (res.data.user?.profilePic) {
+          setProfilePic(res.data.user.profilePic);
+        }
+
+        console.log("profile pic: ", profilePic);
+        
       } catch (error) {
         console.log("Failed to fetch profile: ", error);
         toast.error("Failed to fetch profile");
@@ -62,7 +110,7 @@ export default function ProfilePage() {
       }
     };
     fetchProfile();
-  }, []);
+  }, [profilePic]);
 
   if (loading) {
     return (
@@ -94,12 +142,45 @@ export default function ProfilePage() {
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="flex flex-col items-center sm:flex-row sm:items-start gap-6">
-              <Avatar className="w-24 h-24 border-2 border-slate-100 dark:border-slate-800">
-                <AvatarImage src="/avatar.png" alt="Profile" />
-                <AvatarFallback className="text-2xl bg-slate-100 dark:bg-slate-800">
-                  {name?.[0]?.toUpperCase() || email?.[0]?.toUpperCase() || "U"}
-                </AvatarFallback>
-              </Avatar>
+              <div 
+                onClick={handleAvatarClick} 
+                className="relative cursor-pointer group rounded-full"
+              >
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleProfileUpload}
+                  accept="image/*"
+                  className="hidden"
+                />
+                <Avatar className="w-24 h-24 border-2 border-slate-100 dark:border-slate-800 transition-all duration-300 group-hover:scale-105 group-hover:shadow-md">
+                  {profilePic ? (
+                    <AvatarImage 
+                      src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_fill,g_face,w_300,h_300,r_max/${profilePic}`} 
+                      alt="Profile" 
+                    />
+                  ) : (
+                    <AvatarImage src="/avatar.png" alt="Default Avatar" />
+                  )}
+                  <AvatarFallback className="text-2xl bg-slate-100 dark:bg-slate-800">
+                    {name?.[0]?.toUpperCase() || email?.[0]?.toUpperCase() || "U"}
+                  </AvatarFallback>
+                </Avatar>
+                
+                {/* Hover overlay with camera icon */}
+                <div className="absolute inset-0 bg-black/40 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-white">
+                    <path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/>
+                    <circle cx="12" cy="13" r="3"/>
+                  </svg>
+                </div>
+
+                {isUploading && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/60 rounded-full z-10">
+                    <Spinner className="w-6 h-6 text-white" />
+                  </div>
+                )}
+              </div>
               
               <div className="space-y-4 w-full">
                 <div className="space-y-2">

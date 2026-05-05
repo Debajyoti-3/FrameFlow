@@ -30,6 +30,7 @@ model User {
   email String @unique
   password String
   name String?
+  profilePic String?
   createdAt DateTime @default(now())
   resetTokens PasswordResetToken[]
   refreshToken RefreshToken[]
