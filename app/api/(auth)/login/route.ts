@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
+import { authLimiter } from "@/lib/rateLimit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -29,6 +30,22 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
+
+    const { success, limit, remaining, reset } = await authLimiter.limit(user.id);
+
+  if (!success) {
+    return NextResponse.json(
+      {
+        message: "Too many requests",
+        limit,
+        remaining,
+        reset,
+      },
+      {
+        status: 429,
+      },
+    );
+  }
 
     const validPassword = await bcrypt.compare(password, user.password);
     if (!validPassword) {

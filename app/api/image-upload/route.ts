@@ -2,6 +2,7 @@ import { CheckAuth } from "@/lib/checkAuth";
 import { v2 as cloudinary } from "cloudinary";
 import { NextResponse, NextRequest } from "next/server";
 import sharp from "sharp"; // using sharp for extra image meta-data/type checks
+import { uploadLimiter } from "@/lib/rateLimit";
 
 // Configuration
 cloudinary.config({
@@ -16,12 +17,29 @@ interface CloudinaryUploadResult {
 }
 
 export async function POST(request: NextRequest) {
-
   const user = await CheckAuth();
   // const userId = user?.id
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { success, limit, remaining, reset } = await uploadLimiter.limit(
+    user.id,
+  );
+
+  if (!success) {
+    return NextResponse.json(
+      {
+        message: "Too many requests",
+        limit,
+        remaining,
+        reset,
+      },
+      {
+        status: 429,
+      },
+    );
   }
 
   try {

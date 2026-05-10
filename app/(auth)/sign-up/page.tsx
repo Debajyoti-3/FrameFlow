@@ -75,16 +75,17 @@ export default function SignUpPage() {
     try {
       const response = await axios.post("/api/signup", formData);
 
-      if (response.status === 429) {
-        toast.error("Too many requests!");
-      }
       if (response.status === 200 || response.status === 201) {
         toast.success("Account created successfully");
         router.push("/sign-in");
       }
     } catch (error: any) {
       console.error("Signup failed:", error);
-      toast.error(error.response?.data?.message || "Something went wrong");
+      if (error.response?.status === 429) {
+        toast.error("Too many requests!");
+      } else {
+        toast.error(error.response?.data?.message || "Something went wrong");
+      }
     } finally {
       setLoading(false);
     }
@@ -105,8 +106,8 @@ export default function SignUpPage() {
         </div>
 
         <div className="space-y-6">
-          <Button 
-            variant="outline" 
+          <Button
+            variant="outline"
             className="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 h-11 rounded-xl shadow-sm"
             onClick={() => toast.info("Google signup coming soon!")}
             type="button"
@@ -166,9 +167,8 @@ export default function SignUpPage() {
                 value={formData.email}
                 onChange={handleChange}
                 required
-                className={`h-11 rounded-xl bg-white dark:bg-slate-900 focus:ring-blue-500 focus:border-blue-500 shadow-sm ${
-                  errors.email ? "border-red-500" : "border-slate-200 dark:border-slate-800"
-                }`}
+                className={`h-11 rounded-xl bg-white dark:bg-slate-900 focus:ring-blue-500 focus:border-blue-500 shadow-sm ${errors.email ? "border-red-500" : "border-slate-200 dark:border-slate-800"
+                  }`}
               />
               {errors.email && (
                 <p className="text-xs text-red-500 mt-1 ml-1">{errors.email}</p>
@@ -185,9 +185,8 @@ export default function SignUpPage() {
                   value={formData.password}
                   onChange={handleChange}
                   required
-                  className={`h-11 rounded-xl pr-10 bg-white dark:bg-slate-900 focus:ring-blue-500 focus:border-blue-500 shadow-sm ${
-                    errors.password ? "border-red-500" : "border-slate-200 dark:border-slate-800"
-                  }`}
+                  className={`h-11 rounded-xl pr-10 bg-white dark:bg-slate-900 focus:ring-blue-500 focus:border-blue-500 shadow-sm ${errors.password ? "border-red-500" : "border-slate-200 dark:border-slate-800"
+                    }`}
                 />
                 <button
                   type="button"
@@ -209,9 +208,9 @@ export default function SignUpPage() {
             </div>
 
             <div className="flex items-center space-x-2 pt-1 pb-1">
-              <input 
-                type="checkbox" 
-                id="terms" 
+              <input
+                type="checkbox"
+                id="terms"
                 className="w-4 h-4 rounded border-slate-300 text-blue-500 focus:ring-blue-500"
                 required
               />
