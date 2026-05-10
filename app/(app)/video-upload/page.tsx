@@ -53,9 +53,13 @@ function page() {
       setTitle("");
       setDescription("");
       router.push("/dashboard");
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
-      toast.error("Error while file upload")
+      if (error.response?.status === 429) {
+        toast.error("Too many requests!");
+      } else {
+        toast.error("Error while file upload")
+      }
     } finally {
       setIsUploading(false);
     }

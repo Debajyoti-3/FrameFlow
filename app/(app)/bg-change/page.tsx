@@ -56,9 +56,13 @@ export default function page() {
       }
       toast.success("File uploaded successfully");
       setUploadedImage(res.data.publicId);
-    } catch (error) {
+    } catch (error: any) {
       console.log("Error while Image Uploading: ", error);
-      toast.error("Error in File Upload");
+      if (error.response?.status === 429) {
+        toast.error("Too many requests!");
+      } else {
+        toast.error("Error in File Upload");
+      }
     } finally {
       setIsUploading(false);
     }

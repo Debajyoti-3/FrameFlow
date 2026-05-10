@@ -39,9 +39,13 @@ export default function ProfilePage() {
         await axios.get("/api/delete-account");
         toast.success("Account Deleted Successfully");
         router.push("/sign-in");
-      } catch (error) {
+      } catch (error: any) {
         console.log("Error in Account Deletion: ", error);
-        toast.error("Failed to delete account");
+        if (error.response?.status === 429) {
+          toast.error("Too many requests!");
+        } else {
+          toast.error("Failed to delete account");
+        }
       } finally {
         setIsDeleting(false);
       }
@@ -73,9 +77,13 @@ export default function ProfilePage() {
         setProfilePic(res.data.publicId);
         toast.success("Profile image uploaded successfully");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log("Image upload failed", error);
-      toast.error("Failed to upload profile image");
+      if (error.response?.status === 429) {
+        toast.error("Too many requests!");
+      } else {
+        toast.error("Failed to upload profile image");
+      }
     } finally {
       setIsUploading(false);
     }
@@ -102,9 +110,13 @@ export default function ProfilePage() {
 
         console.log("profile pic: ", profilePic);
         
-      } catch (error) {
+      } catch (error: any) {
         console.log("Failed to fetch profile: ", error);
-        toast.error("Failed to fetch profile");
+        if (error.response?.status === 429) {
+          toast.error("Too many requests!");
+        } else {
+          toast.error("Failed to fetch profile");
+        }
       } finally {
         setLoading(false);
       }

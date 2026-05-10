@@ -7,6 +7,7 @@ import { Video } from "@/types"; // types of the video
 import { Spinner } from "@/components/ui/spinner";
 import { VideoIcon } from "lucide-react";
 import { ModeToggle } from "@/components/theme-toggle";
+import { toast } from "sonner";
 
 function Dashboard() {
   const [videos, setVideos] = useState<Video[]>([]);
@@ -21,8 +22,11 @@ function Dashboard() {
       } else {
         throw new Error(" Unexpected response format");
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log(error);
+      if (error.response?.status === 429) {
+        toast.error("Too many requests!");
+      }
       setError("Failed to fetch videos");
     } finally {
       setLoading(false);

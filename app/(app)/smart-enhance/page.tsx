@@ -14,7 +14,7 @@ import {
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Spinner } from "@/components/ui/spinner";
-import {toast} from "sonner";
+import { toast } from "sonner";
 import { UploadIcon, DownloadIcon, ImageIcon, TagIcon } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 
@@ -69,9 +69,13 @@ export default function SmartEnhancePage() {
       toast.success("File uploaded and analyzed successfully!");
       setUploadedImage(res.data.publicId);
       setTags(res.data.tags || []);
-    } catch (error) {
+    } catch (error: any) {
       console.log("Error while Image Uploading: ", error);
-      toast.error("Error in File Upload");
+      if (error.response?.status === 429) {
+        toast.error("Too many requests!");
+      } else {
+        toast.error("Error in File Upload");
+      }
     } finally {
       setIsUploading(false);
     }

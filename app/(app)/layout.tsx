@@ -52,8 +52,11 @@ export default function AppLayout({
           setUser(null);
           router.push("/sign-in");
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error("Auth check failed", error);
+        if (error.response?.status === 429) {
+          toast.error("Too many requests!");
+        }
         setUser(null);
         router.push("/sign-in");
       } finally {
@@ -74,9 +77,13 @@ export default function AppLayout({
       setUser(null);
       toast.success("Logout successful");
       router.push("/sign-in");
-    } catch (error) {
+    } catch (error: any) {
       console.error("Logout failed", error);
-      toast.error("Logout failed");
+      if (error.response?.status === 429) {
+        toast.error("Too many requests!");
+      } else {
+        toast.error("Logout failed");
+      }
     }
   };
 

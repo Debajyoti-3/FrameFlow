@@ -3,6 +3,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { NextResponse, NextRequest } from "next/server";
 import sharp from "sharp"; // using sharp for extra image meta-data/type checks
 import { prisma } from "@/lib/prisma";
+import { uploadLimiter } from "@/lib/rateLimit";
 
 cloudinary.config({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
@@ -20,6 +21,24 @@ export async function POST(request: NextRequest) {
 
   if (!user) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { success, limit, remaining, reset } = await uploadLimiter.limit(
+    user.id,
+  );
+
+  if (!success) {
+    return NextResponse.json(
+      {
+        message: "Too many requests",
+        limit,
+        remaining,
+        reset,
+      },
+      {
+        status: 429,
+      },
+    );
   }
 
   try {
@@ -50,7 +69,7 @@ export async function POST(request: NextRequest) {
 
     await prisma.user.update({
       where: {
-        id: user.id
+        id: user.id,
       },
       data: {
         profilePic: result.public_id,
