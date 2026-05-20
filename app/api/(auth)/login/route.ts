@@ -31,23 +31,35 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const { success, limit, remaining, reset } = await authLimiter.limit(user.id);
+    if (user.provider === "google" && !user.password) {
+      return NextResponse.json(
+        {
+          message:
+            "This account uses Google Sign-In. Please click the 'Sign in with Google' button.",
+        },
+        { status: 409 },
+      );
+    }
 
-  if (!success) {
-    return NextResponse.json(
-      {
-        message: "Too many requests",
-        limit,
-        remaining,
-        reset,
-      },
-      {
-        status: 429,
-      },
+    const { success, limit, remaining, reset } = await authLimiter.limit(
+      user.id,
     );
-  }
 
-    const validPassword = await bcrypt.compare(password, user.password);
+    if (!success) {
+      return NextResponse.json(
+        {
+          message: "Too many requests",
+          limit,
+          remaining,
+          reset,
+        },
+        {
+          status: 429,
+        },
+      );
+    }
+
+    const validPassword = await bcrypt.compare(password, user.password!);
     if (!validPassword) {
       return NextResponse.json(
         { message: "given password is not valid" },

@@ -1,5 +1,5 @@
 {
-  "name": "cloudinary-saas",
+  "name": "frameflow",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -27,6 +27,7 @@
     "dayjs": "^1.11.19",
     "dotenv": "^17.2.3",
     "filesize": "^11.0.13",
+    "google-auth-library": "^10.6.2",
     "jsonwebtoken": "^9.0.3",
     "lucide-react": "^0.555.0",
     "motion": "^12.26.2",
