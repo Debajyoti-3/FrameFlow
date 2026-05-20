@@ -6,6 +6,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
 import axios from "axios";
 import { ModeToggle } from "@/components/theme-toggle";
+import { getProfileImageUrl } from "@/lib/profileImage";
+
 import {
   LogOutIcon,
   MenuIcon,
@@ -195,7 +197,7 @@ export default function AppLayout({
                       <Avatar className="h-8 w-8">
                         {user.profilePic ? (
                           <AvatarImage 
-                            src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_fill,g_face,w_100,h_100,r_max/${user.profilePic}`} 
+                            src={getProfileImageUrl(user.profilePic, { width: 100, height: 100 })} 
                             alt="Profile" 
                           />
                         ) : (

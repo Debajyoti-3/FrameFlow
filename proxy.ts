@@ -25,7 +25,9 @@ export function proxy(req: NextRequest) {
     currentUrl.pathname.startsWith("/api/logout") ||
     currentUrl.pathname.startsWith("/api/forgot-password") ||
     currentUrl.pathname.startsWith("/api/reset-password") ||
-    currentUrl.pathname.startsWith("/api/refresh-token");
+    currentUrl.pathname.startsWith("/api/refresh-token")||
+    currentUrl.pathname.startsWith("/api/google") ||
+    currentUrl.pathname.startsWith("/api/auth/callback/google") ;
 
   const isAccessingDashboard = currentUrl.pathname === "/dashboard";
   const isAccessingHome = currentUrl.pathname === "/";

@@ -18,6 +18,7 @@ import {
   CardFooter,
 } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import {getProfileImageUrl} from "@/lib/profileImage";
 
 export default function ProfilePage() {
   const [loading, setLoading] = useState(true);
@@ -168,7 +169,7 @@ export default function ProfilePage() {
                 <Avatar className="w-24 h-24 border-2 border-slate-100 dark:border-slate-800 transition-all duration-300 group-hover:scale-105 group-hover:shadow-md">
                   {profilePic ? (
                     <AvatarImage 
-                      src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_fill,g_face,w_300,h_300,r_max/${profilePic}`} 
+                      src={getProfileImageUrl(profilePic, { width: 300, height: 300 })} 
                       alt="Profile" 
                     />
                   ) : (

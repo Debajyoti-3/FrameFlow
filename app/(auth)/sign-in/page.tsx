@@ -2,7 +2,7 @@
 
 import axios from "axios";
 import React, { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,10 +19,20 @@ import Link from "next/link";
 import { Loader2, Eye, EyeOff, Layout } from "lucide-react";
 import { ModeToggle } from "@/components/theme-toggle";
 
-export default function SignInPage() {
+function SignInContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+
+  React.useEffect(() => {
+    const error = searchParams.get("error");
+    if (error === "OAuthFailed") {
+      toast.error("Google authentication failed. Please try again.");
+    } else if (error === "NoCodeProvided") {
+      toast.error("Google authentication was cancelled.");
+    }
+  }, [searchParams]);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -55,6 +65,14 @@ export default function SignInPage() {
     }
   };
 
+  const handleClick = async () => {
+    try {
+      await axios.get("/api/google")
+    } catch (error) {
+      console.log("Google Auth Error: ", error)
+    }
+  }
+
   return (
     <div className="flex w-full items-center justify-center p-4">
       <div className="w-full max-w-[400px] space-y-8">
@@ -70,11 +88,13 @@ export default function SignInPage() {
         </div>
 
         <div className="space-y-6">
-          <Button 
-            variant="outline" 
-            className="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 h-11 rounded-xl shadow-sm"
-            onClick={() => toast.info("Google login coming soon!")}
-            type="button"
+          <div>
+            <a href="/api/google" >
+            <Button
+            
+            variant="outline"
+            className="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 h-11 rounded-xl shadow-sm cursor-pointer"
+            asChild
           >
             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
               <path
@@ -96,6 +116,8 @@ export default function SignInPage() {
             </svg>
             Continue with Google
           </Button>
+          </a>
+          </div>
 
           <div className="relative">
             <div className="absolute inset-0 flex items-center">
@@ -110,7 +132,12 @@ export default function SignInPage() {
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="email" className="text-xs font-semibold text-slate-700 dark:text-slate-300 ml-1">Email</Label>
+              <Label
+                htmlFor="email"
+                className="text-xs font-semibold text-slate-700 dark:text-slate-300 ml-1"
+              >
+                Email
+              </Label>
               <Input
                 id="email"
                 type="email"
@@ -123,7 +150,12 @@ export default function SignInPage() {
             </div>
             <div className="space-y-1.5">
               <div className="flex items-center justify-between ml-1">
-                <Label htmlFor="password" className="text-xs font-semibold text-slate-700 dark:text-slate-300">Password</Label>
+                <Label
+                  htmlFor="password"
+                  className="text-xs font-semibold text-slate-700 dark:text-slate-300"
+                >
+                  Password
+                </Label>
                 <span
                   onClick={() => router.push("/forgot-password")}
                   className="text-xs font-medium text-slate-500 hover:text-blue-500 cursor-pointer transition-colors"
@@ -154,11 +186,11 @@ export default function SignInPage() {
                 </button>
               </div>
             </div>
-            
+
             <div className="pt-2">
-              <Button 
-                type="submit" 
-                className="w-full h-11 rounded-xl text-slate-900 dark:text-slate-100 cursor-pointer text-white font-medium shadow-sm transition-all" 
+              <Button
+                type="submit"
+                className="w-full h-11 rounded-xl text-slate-900 dark:text-black cursor-pointer text-white font-medium shadow-sm transition-all"
                 disabled={loading}
               >
                 {loading ? (
@@ -175,12 +207,23 @@ export default function SignInPage() {
 
           <p className="text-center text-sm text-slate-500 dark:text-slate-400">
             Don&apos;t have an account?{" "}
-            <Link href="/sign-up" className="font-medium text-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors">
+            <Link
+              href="/sign-up"
+              className="font-medium text-blue-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
+            >
               Sign up
             </Link>
           </p>
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignInPage() {
+  return (
+    <React.Suspense fallback={<div>Loading...</div>}>
+      <SignInContent />
+    </React.Suspense>
   );
 }

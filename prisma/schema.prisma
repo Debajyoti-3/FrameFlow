@@ -12,6 +12,10 @@ generator client {
 datasource db {
   provider = "postgresql"
 }
+enum AuthProvider {
+  local
+  google
+}
 
 model Video {
   id String @id @default(cuid())
@@ -28,7 +32,8 @@ model Video {
 model User {
   id String @id @default(cuid())
   email String @unique
-  password String
+  provider AuthProvider @default(local)
+  password String?
   name String?
   profilePic String?
   createdAt DateTime @default(now())
