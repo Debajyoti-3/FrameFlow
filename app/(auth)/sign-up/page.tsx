@@ -4,12 +4,13 @@ import axios from "axios";
 import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import Link from "next/link";
 import { Loader2, Eye, EyeOff, Layout } from "lucide-react";
 import { ModeToggle } from "@/components/theme-toggle";
+import { cn } from "@/lib/utils";
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -99,13 +100,14 @@ export default function SignUpPage() {
 
         <div className="space-y-6">
           <div>
-            <Button
-            variant="outline"
-            className="w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 h-11 rounded-xl shadow-sm"
-            asChild
-          >
-            <a href="/api/google">
-              <svg className="w-5 h-5 mx-2" viewBox="0 0 24 24">
+            <a
+              href="/api/google"
+              className={cn(
+                buttonVariants({ variant: "outline" }),
+                "w-full bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 h-11 rounded-xl shadow-sm cursor-pointer"
+              )}
+            >
+              <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
                 <path
                   d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
                   fill="#4285F4"
@@ -125,7 +127,6 @@ export default function SignUpPage() {
               </svg>
               Continue with Google
             </a>
-          </Button>
           </div>
 
           <div className="relative">
@@ -217,7 +218,7 @@ export default function SignUpPage() {
             <div className="pt-2">
               <Button
                 type="submit"
-                className="w-full h-11 rounded-xl text-slate-900 dark:text-slate-100 cursor-pointer text-white font-medium shadow-sm transition-all"
+                className="w-full h-11 rounded-xl text-slate-900 dark:black cursor-pointer text-white font-medium shadow-sm transition-all"
                 disabled={loading || !!errors.email || !!errors.password}
               >
                 {loading ? (
