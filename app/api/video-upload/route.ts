@@ -12,19 +12,26 @@ cloudinary.config({
   api_secret: process.env.CLOUDINARY_API_SECRET,
 });
 
-interface CloudinaryUploadResult {
-  public_id: string;
-  bytes: number;
-  duration?: number;
-  [key: string]: any;
-}
-
-export async function POST(request: NextRequest) {
+/**
+ *  GET Request: Generates a secure, signed token for the frontend to upload directly to Cloudinary.
+ * This completely bypasses serverless payload size limits!
+ */
+export async function GET(request: NextRequest) {
   try {
     const user = await CheckAuth();
-
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized", status: 401 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Rate limiting execution before issuing signature
+    const { success, limit, remaining, reset } = await uploadLimiter.limit(
+      user.id,
+    );
+    if (!success) {
+      return NextResponse.json(
+        { message: "Too many requests", limit, remaining, reset },
+        { status: 429 },
+      );
     }
 
     if (
@@ -32,72 +39,84 @@ export async function POST(request: NextRequest) {
       !process.env.CLOUDINARY_API_KEY ||
       !process.env.CLOUDINARY_API_SECRET
     ) {
-      return NextResponse.json({
-        error: "Cloudinary Config is not setup properly",
-      });
-    }
-
-    const { success, limit, remaining, reset } = await uploadLimiter.limit(
-      user.id,
-    );
-
-    if (!success) {
       return NextResponse.json(
-        {
-          message: "Too many requests",
-          limit,
-          remaining,
-          reset,
-        },
-        {
-          status: 429,
-        },
+        { error: "Cloudinary Config is not setup properly" },
+        { status: 500 },
       );
     }
-    const formData = await request.formData(); // So yes, you use FormData() constructor when creating/sending, but request.formData() method when receiving/parsing in Next.js!
-    const file = formData.get("file") as File | null;
-    const originalSize = formData.get("originalSize") as string;
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
 
-    if (!file) {
-      return NextResponse.json({ error: "file not found" });
+    const timestamp = Math.round(new Date().getTime() / 1000);
+
+    // These parameters MUST match exactly what the frontend sends to Cloudinary
+    const paramsToSign = {
+      timestamp: timestamp,
+      folder: "cloudinary-video-uploads",
+    };
+
+    const signature = cloudinary.utils.api_sign_request(
+      paramsToSign,
+      process.env.CLOUDINARY_API_SECRET,
+    );
+
+    return NextResponse.json({
+      signature,
+      timestamp,
+      apiKey: process.env.CLOUDINARY_API_KEY,
+      cloudName: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+    });
+  } catch (error) {
+    console.error("Failed to generate upload signature:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
+  }
+}
+
+  // POST Request: Receives JSON data after successful client-side upload to save information in Prisma.
+ 
+export async function POST(request: NextRequest) {
+  try {
+    const user = await CheckAuth();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const bytes = await file.arrayBuffer(); // creating bytes from the file
-    const buffer = Buffer.from(bytes); // creating buffer from bytes (it will be uploaded in cloudinary)
+    // Expecting standard JSON now, not heavy multi-part form data
+    const body = await request.json();
+    const {
+      title,
+      description,
+      publicId,
+      duration,
+      originalSize,
+      compressedSize,
+    } = body;
 
-    const result = await new Promise<CloudinaryUploadResult>(
-      (resolve, reject) => {
-        const uploadStream = cloudinary.uploader.upload_stream(
-          {
-            resource_type: "video",
-            folder: "cloudinary-video-uploads",
-            transformation: [{ quality: "auto", fetch_format: "mp4" }],
-          },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result as CloudinaryUploadResult);
-          },
-        );
-        uploadStream.end(buffer);
-      },
-    );
+    if (!title || !publicId) {
+      return NextResponse.json(
+        { error: "Missing required fields" },
+        { status: 400 },
+      );
+    }
 
     const video = await prisma.video.create({
       data: {
         title,
         description,
-        publicId: result.public_id,
-        duration: result.duration || 0,
-        originalSize: originalSize,
-        compressedSize: String(result.bytes),
+        publicId,
+        duration: duration || 0,
+        originalSize: String(originalSize),
+        compressedSize: String(compressedSize),
       },
     });
 
     return NextResponse.json(video);
   } catch (error) {
-    console.log("Video upload failed", error);
-    return NextResponse.json({ error: "Video upload failed" }, { status: 500 });
+    console.error("Video saving database entry failed", error);
+    return NextResponse.json(
+      { error: "Failed to record video data" },
+      { status: 500 },
+    );
   }
 }

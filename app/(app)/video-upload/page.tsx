@@ -35,52 +35,59 @@ function page() {
       toast.error("Please select a video file");
       return;
     }
+
     if (file.size > MAX_FILE_SIZE) {
       toast.error(`File size exceeds ${MAX_FILE_SIZE / (1024 * 1024)}MB limit`);
       return;
     }
 
-    setIsUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    formData.append("title", title);
-    formData.append("description", description);
-    formData.append("originalSize", file.size.toString());
-
     try {
-      const res = await axios.post("/api/video-upload", formData);
-      if (!res.data) {
-        toast.error(`Error in File upload ${res.data.error || ""}`);
-        throw new Error("Error in file upload");
-      }
-      toast.success("File successfully uploaded");
-      // Reset form
+      setIsUploading(true);
+
+      // Get signed upload details
+      const signatureRes = await axios.get("/api/video-upload");
+
+      const { signature, timestamp, apiKey, cloudName } = signatureRes.data;
+
+      //  Upload directly to Cloudinary
+      const cloudinaryFormData = new FormData();
+
+      cloudinaryFormData.append("file", file);
+      cloudinaryFormData.append("api_key", apiKey);
+      cloudinaryFormData.append("timestamp", timestamp);
+      cloudinaryFormData.append("signature", signature);
+
+      cloudinaryFormData.append("folder", "cloudinary-video-uploads");
+
+      const cloudinaryRes = await axios.post(
+        `https://api.cloudinary.com/v1_1/${cloudName}/video/upload`,
+        cloudinaryFormData,
+      );
+
+      // Save metadata to DB
+      const saveRes = await axios.post("/api/video-upload", {
+        title,
+        description,
+        publicId: cloudinaryRes.data.public_id,
+        duration: cloudinaryRes.data.duration,
+        originalSize: file.size,
+        compressedSize: cloudinaryRes.data.bytes,
+      });
+
+      toast.success("Video uploaded successfully!");
+
       setFile(null);
       setTitle("");
       setDescription("");
+
       router.push("/dashboard");
     } catch (error: any) {
-      console.log(error);
-      console.log(error);
+      console.error(error);
 
-      // Expose exact details to your phone screen
-      const errorMessage = error.message || "Unknown error";
-      const status = error.response?.status
-        ? `[Status ${error.response.status}]`
-        : "";
-      const serverResponseBody = error.response?.data
-        ? JSON.stringify(error.response.data)
-        : "No response body";
+      const message =
+        error?.response?.data?.error || error.message || "Upload failed";
 
-      // Use a standard alert box because it won't disappear like a toast
-      alert(
-        `Upload Failed!\nMessage: ${errorMessage}\nStatus: ${status}\nDetails: ${serverResponseBody}`,
-      );
-      if (error.response?.status === 429) {
-        toast.error("Too many requests!");
-      } else {
-        toast.error("Error while file upload");
-      }
+      toast.error(message);
     } finally {
       setIsUploading(false);
     }
@@ -157,7 +164,7 @@ function page() {
               )}
             </div>
 
-            <Button type="submit" className="w-full" disabled={isUploading}>
+            <Button type="submit" className="w-full cursor-pointer" disabled={isUploading}>
               {isUploading ? (
                 <>
                   <Spinner className="mr-2 h-4 w-4" />
