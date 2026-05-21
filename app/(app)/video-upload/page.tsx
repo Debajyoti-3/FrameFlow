@@ -8,7 +8,13 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { UploadIcon, Loader2Icon } from "lucide-react";
 import { Spinner } from "@/components/ui/spinner";
 
@@ -24,7 +30,7 @@ function page() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!file) {
       toast.error("Please select a video file");
       return;
@@ -38,16 +44,16 @@ function page() {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("title", title);
-    formData.append("description", description);    
+    formData.append("description", description);
     formData.append("originalSize", file.size.toString());
 
     try {
       const res = await axios.post("/api/video-upload", formData);
-      if(!res.data){
-        toast.error("Error in File upload")
-        throw new Error("Error in file upload")
+      if (!res.data) {
+        toast.error(`Error in File upload ${res.data.error || ""}`);
+        throw new Error("Error in file upload");
       }
-      toast.success("File successfully uploaded")
+      toast.success("File successfully uploaded");
       // Reset form
       setFile(null);
       setTitle("");
@@ -55,10 +61,25 @@ function page() {
       router.push("/dashboard");
     } catch (error: any) {
       console.log(error);
+      console.log(error);
+
+      // Expose exact details to your phone screen
+      const errorMessage = error.message || "Unknown error";
+      const status = error.response?.status
+        ? `[Status ${error.response.status}]`
+        : "";
+      const serverResponseBody = error.response?.data
+        ? JSON.stringify(error.response.data)
+        : "No response body";
+
+      // Use a standard alert box because it won't disappear like a toast
+      alert(
+        `Upload Failed!\nMessage: ${errorMessage}\nStatus: ${status}\nDetails: ${serverResponseBody}`,
+      );
       if (error.response?.status === 429) {
         toast.error("Too many requests!");
       } else {
-        toast.error("Error while file upload")
+        toast.error("Error while file upload");
       }
     } finally {
       setIsUploading(false);
@@ -70,15 +91,18 @@ function page() {
     const k = 1024;
     const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + " " + sizes[i];
+    return Math.round((bytes / Math.pow(k, i)) * 100) / 100 + " " + sizes[i];
   };
 
   return (
     <div className="max-w-2xl mx-auto space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">Upload Video</h1>
+        <h1 className="text-3xl font-bold text-slate-900 dark:text-slate-100">
+          Upload Video
+        </h1>
         <p className="text-slate-600 dark:text-slate-400 mt-1">
-          Upload and compress your video files (max {MAX_FILE_SIZE / (1024 * 1024)}MB)
+          Upload and compress your video files (max{" "}
+          {MAX_FILE_SIZE / (1024 * 1024)}MB)
         </p>
       </div>
 
@@ -133,11 +157,7 @@ function page() {
               )}
             </div>
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isUploading}
-            >
+            <Button type="submit" className="w-full" disabled={isUploading}>
               {isUploading ? (
                 <>
                   <Spinner className="mr-2 h-4 w-4" />
