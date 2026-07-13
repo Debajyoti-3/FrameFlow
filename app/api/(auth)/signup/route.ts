@@ -4,6 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcrypt";
 import { prisma } from "@/lib/prisma";
 import { sendOnboardingEmail } from "@/lib/sendOnBoardingEmail";
+import { verifyTurnstileToken } from "@/lib/turnstile";
 
 
 export async function POST(req: NextRequest) {
@@ -14,7 +15,7 @@ export async function POST(req: NextRequest) {
     const passwordRegex = /^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d@$!%*#?&]{8,}$/;
 
     const reqBody = await req.json();
-    const { password, email, name } = reqBody;
+    const { password, email, name, turnstileToken } = reqBody;
 
     if (!password || !email || !name) {
       return NextResponse.json(
@@ -22,6 +23,16 @@ export async function POST(req: NextRequest) {
         { status: 400 },
       );
     }
+
+    const ip = req.headers.get("x-forwarded-for");
+    const isTurnstileValid = await verifyTurnstileToken(turnstileToken, ip);
+    if (!isTurnstileValid) {
+      return NextResponse.json(
+        { message: "Verification failed. Please complete the captcha." },
+        { status: 400 },
+      );
+    }
+
     if (!emailRegex.test(email)) {
       return NextResponse.json(
         { message: "Invalid email format" },

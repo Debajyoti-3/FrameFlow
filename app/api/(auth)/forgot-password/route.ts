@@ -3,16 +3,26 @@ import { prisma } from "@/lib/prisma";
 import { sendResetEmail } from "@/lib/sendResetEmail";
 import { authLimiter } from "@/lib/rateLimit";
 import { NextResponse } from "next/server";
+import { verifyTurnstileToken } from "@/lib/turnstile";
 
 export async function POST(req: Request) {
-  const { email } = await req.json();
+  const { email, turnstileToken } = await req.json();
+
+  const ip = req.headers.get("x-forwarded-for");
+  const isTurnstileValid = await verifyTurnstileToken(turnstileToken, ip);
+  if (!isTurnstileValid) {
+    return NextResponse.json(
+      { message: "Verification failed. Please complete the captcha." },
+      { status: 400 },
+    );
+  }
 
   const user = await prisma.user.findUnique({
     where: { email },
   });
 
   if (!user) {
-    return Response.json({ message: "If user exists, email sent" });
+    return NextResponse.json({ message: "If user exists, email sent" });
   }
 
   const { success, limit, remaining, reset } = await authLimiter.limit(user.id);

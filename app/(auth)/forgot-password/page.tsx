@@ -9,18 +9,24 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Turnstile } from "@/components/ui/turnstile";
 
 export default function page() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!turnstileToken) {
+      toast.error("Please complete the Turnstile captcha verification.");
+      return;
+    }
     setLoading(true);
 
     try {
-      await axios.post("/api/forgot-password", { email });
+      await axios.post("/api/forgot-password", { email, turnstileToken });
       setSubmitted(true);
       toast.success("If an account exists, a reset link has been sent.");
     } catch (err) {
@@ -104,6 +110,8 @@ export default function page() {
                 className="h-11 rounded-xl bg-white dark:bg-slate-900 border-slate-200 dark:border-slate-800 focus:ring-blue-500 focus:border-blue-500 shadow-sm"
               />
             </div>
+
+            <Turnstile onVerify={setTurnstileToken} />
             
             <div className="pt-2">
               <Button 

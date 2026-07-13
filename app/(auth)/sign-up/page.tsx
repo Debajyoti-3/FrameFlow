@@ -11,11 +11,13 @@ import Link from "next/link";
 import { Loader2, Eye, EyeOff, Layout } from "lucide-react";
 import { ModeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
+import { Turnstile } from "@/components/ui/turnstile";
 
 export default function SignUpPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -63,10 +65,18 @@ export default function SignUpPage() {
       return;
     }
 
+    if (!turnstileToken) {
+      toast.error("Please complete the Turnstile captcha verification.");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      const response = await axios.post("/api/signup", formData);
+      const response = await axios.post("/api/signup", {
+        ...formData,
+        turnstileToken,
+      });
 
       if (response.status === 200 || response.status === 201) {
         toast.success("Account created successfully");
@@ -214,6 +224,8 @@ export default function SignUpPage() {
                 I agree to FrameFlow's <Link href="/legal" className="text-blue-500 hover:underline cursor-pointer">Terms of Service & Privacy Policy.</Link>
               </label>
             </div>
+
+            <Turnstile onVerify={setTurnstileToken} />
 
             <div className="pt-2">
               <Button

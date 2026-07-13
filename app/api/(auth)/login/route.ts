@@ -5,15 +5,25 @@ import jwt from "jsonwebtoken";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt";
 import { authLimiter } from "@/lib/rateLimit";
+import { verifyTurnstileToken } from "@/lib/turnstile";
 
 export async function POST(req: NextRequest) {
   try {
     const reqBody = await req.json();
-    const { email, password } = reqBody;
+    const { email, password, turnstileToken } = reqBody;
 
     if (!email || !password) {
       return NextResponse.json(
         { message: "required fields are empty" },
+        { status: 400 },
+      );
+    }
+
+    const ip = req.headers.get("x-forwarded-for");
+    const isTurnstileValid = await verifyTurnstileToken(turnstileToken, ip);
+    if (!isTurnstileValid) {
+      return NextResponse.json(
+        { message: "Verification failed. Please complete the captcha." },
         { status: 400 },
       );
     }

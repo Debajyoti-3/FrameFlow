@@ -19,12 +19,14 @@ import Link from "next/link";
 import { Loader2, Eye, EyeOff, Layout } from "lucide-react";
 import { ModeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
+import { Turnstile } from "@/components/ui/turnstile";
 
 function SignInContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [turnstileToken, setTurnstileToken] = useState<string | null>(null);
 
   React.useEffect(() => {
     const error = searchParams.get("error");
@@ -45,10 +47,17 @@ function SignInContent() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!turnstileToken) {
+      toast.error("Please complete the Turnstile captcha verification.");
+      return;
+    }
     setLoading(true);
 
     try {
-      const response = await axios.post("/api/login", formData);
+      const response = await axios.post("/api/login", {
+        ...formData,
+        turnstileToken,
+      });
       if (response.status === 200) {
         toast.success("Login successful");
         router.push("/");
@@ -184,6 +193,8 @@ function SignInContent() {
                 </button>
               </div>
             </div>
+ 
+            <Turnstile onVerify={setTurnstileToken} />
 
             <div className="pt-2">
               <Button
