@@ -23,7 +23,7 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    // Rate limiting execution before issuing signature
+    // Rate limiting 
     const { success, limit, remaining, reset } = await uploadLimiter.limit(
       user.id,
     );
@@ -100,6 +100,23 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check user credits first
+  try {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id , credits: { gte: 1 } }, 
+    });
+
+    if (!dbUser ) {
+      return NextResponse.json(
+        { error: "Insufficient credits" },
+        { status: 403 }
+      );
+    }
+  } catch (dbError) {
+    console.error("Database error during credit check:", dbError);
+    return NextResponse.json({ error: "Database error" }, { status: 500 });
+  }
+
     const video = await prisma.video.create({
       data: {
         title,
@@ -109,6 +126,13 @@ export async function POST(request: NextRequest) {
         originalSize: String(originalSize),
         compressedSize: String(compressedSize),
       },
+    });
+
+    await prisma.user.update({
+      where: { id: user.id },
+      data: { 
+        credits: { decrement: 1 }
+      }
     });
 
     return NextResponse.json(video);

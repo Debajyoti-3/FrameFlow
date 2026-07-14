@@ -36,6 +36,7 @@ model User {
   password String?
   name String?
   profilePic String?
+  credits Int @default(5)
   createdAt DateTime @default(now())
   resetTokens PasswordResetToken[]
   refreshToken RefreshToken[]

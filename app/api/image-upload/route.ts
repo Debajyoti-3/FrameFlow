@@ -3,6 +3,7 @@ import { v2 as cloudinary } from "cloudinary";
 import { NextResponse, NextRequest } from "next/server";
 import sharp from "sharp"; // using sharp for extra image meta-data/type checks
 import { uploadLimiter } from "@/lib/rateLimit";
+import { prisma } from "@/lib/prisma";
 
 // Configuration
 cloudinary.config({
@@ -42,6 +43,23 @@ export async function POST(request: NextRequest) {
     );
   }
 
+  // Check user credits first
+  try {
+    const dbUser = await prisma.user.findUnique({
+      where: { id: user.id , credits: { gte: 1 } }, 
+    });
+
+    if (!dbUser ) {
+      return NextResponse.json(
+        { error: "Insufficient credits" },
+        { status: 403 }
+      );
+    }
+  } catch (dbError) {
+    console.error("Database error during credit check:", dbError);
+    return NextResponse.json({ error: "Database error" }, { status: 500 });
+  }
+
   try {
     const formData = await request.formData();
     const file = formData.get("file") as File | null;
@@ -67,6 +85,14 @@ export async function POST(request: NextRequest) {
         uploadStream.end(processed);
       },
     );
+
+    // Decrement credits on successful upload
+    await prisma.user.update({
+      where: { id: user.id },
+      data: {
+        credits: { decrement: 1 },
+      },
+    });
 
     return NextResponse.json({ publicId: result.public_id }, { status: 200 });
   } catch (error) {

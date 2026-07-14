@@ -22,9 +22,10 @@ export async function GET() {
     const name = fetchedUser?.name || "Unknown";
     const email = fetchedUser?.email;
     const profilePic = fetchedUser?.profilePic || null;
+    const credits = fetchedUser?.credits;
 
     return NextResponse.json({
-      user: { name, email, profilePic },
+      user: { name, email, profilePic, credits },
       messege: "user data fetched",
     });
   } catch (error) {
