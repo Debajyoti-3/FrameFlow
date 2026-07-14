@@ -7,19 +7,9 @@ import { toast } from "sonner";
 import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import Link from "next/link";
 import { Loader2, Eye, EyeOff, Layout } from "lucide-react";
-import { ModeToggle } from "@/components/theme-toggle";
 import { cn } from "@/lib/utils";
-import { Turnstile } from "@/components/ui/turnstile";
 
 function SignInContent() {
   const router = useRouter();
@@ -193,8 +183,6 @@ function SignInContent() {
                 </button>
               </div>
             </div>
- 
-            <Turnstile onVerify={setTurnstileToken} />
 
             <div className="pt-2">
               <Button
