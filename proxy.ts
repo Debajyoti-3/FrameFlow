@@ -12,12 +12,12 @@ export function proxy(req: NextRequest) {
     currentUrl.pathname === "/" ||
     currentUrl.pathname === "/forgot-password" ||
     currentUrl.pathname === "/legal" ||
-    currentUrl.pathname === "/reset-password" ||
-    currentUrl.pathname === "/create-order";
-    
+    currentUrl.pathname === "/reset-password";
 
-
-  const isPublicApiRoute = currentUrl.pathname === "/api/videos";
+  const isPublicApiRoute =
+    currentUrl.pathname === "/api/videos" ||
+    currentUrl.pathname === "/api/create-order" ||
+    currentUrl.pathname === "/api/webhooks/razorpay";
 
   const isAuthApiRoute =
     currentUrl.pathname.startsWith("/api/login") ||
@@ -26,9 +26,9 @@ export function proxy(req: NextRequest) {
     currentUrl.pathname.startsWith("/api/logout") ||
     currentUrl.pathname.startsWith("/api/forgot-password") ||
     currentUrl.pathname.startsWith("/api/reset-password") ||
-    currentUrl.pathname.startsWith("/api/refresh-token")||
+    currentUrl.pathname.startsWith("/api/refresh-token") ||
     currentUrl.pathname.startsWith("/api/google") ||
-    currentUrl.pathname.startsWith("/api/auth/callback/google") ;
+    currentUrl.pathname.startsWith("/api/auth/callback/google");
 
   const isAccessingDashboard = currentUrl.pathname === "/dashboard";
   const isAccessingHome = currentUrl.pathname === "/";
@@ -50,7 +50,12 @@ export function proxy(req: NextRequest) {
       }
       return NextResponse.next();
     }
-    if (!isApiRequest && !isPublicRoute && !isPublicApiRoute && !isAuthApiRoute ) {
+    if (
+      !isApiRequest &&
+      !isPublicRoute &&
+      !isPublicApiRoute &&
+      !isAuthApiRoute
+    ) {
       const refreshUrl = new URL("/api/refresh-token", req.nextUrl);
       refreshUrl.searchParams.set("redirect", currentUrl.pathname);
 
