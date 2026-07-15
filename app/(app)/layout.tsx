@@ -18,6 +18,7 @@ import {
   XIcon,
   Eraser,
   Wand2,
+  CreditCard,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
@@ -192,6 +193,16 @@ export default function AppLayout({
             <div className="flex items-center gap-4">
               {user && (
                 <>
+                  <Link href="/subscription">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      className="cursor-pointer dark:bg-white bg-slate-800 text-white dark:text-slate-500 font-semibold shadow-sm transition-all duration-200 hover:shadow-md flex items-center gap-2 rounded-full px-2 sm:px-3"
+                    >
+                      <CreditCard className="w-3 h-3" />
+                      <span className="text-xs sm:text-sm">Buy Credits</span>
+                    </Button>
+                  </Link>
                   <Link href="/profile-page">
                     <div className="hidden sm:flex items-center gap-3">
                       <Avatar className="h-8 w-8">

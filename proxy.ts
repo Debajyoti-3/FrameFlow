@@ -12,7 +12,8 @@ export function proxy(req: NextRequest) {
     currentUrl.pathname === "/" ||
     currentUrl.pathname === "/forgot-password" ||
     currentUrl.pathname === "/legal" ||
-    currentUrl.pathname === "/reset-password";
+    currentUrl.pathname === "/reset-password" ||
+    currentUrl.pathname === "/create-order";
     
 
 
