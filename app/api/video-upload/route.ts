@@ -103,10 +103,10 @@ export async function POST(request: NextRequest) {
     // Check user credits first
   try {
     const dbUser = await prisma.user.findUnique({
-      where: { id: user.id , credits: { gte: 1 } }, 
+      where: { id: user.id  }, 
     });
 
-    if (!dbUser ) {
+    if ( dbUser && dbUser.creditUsed >= dbUser.credits) {
       return NextResponse.json(
         { error: "Insufficient credits" },
         { status: 403 }
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
     await prisma.user.update({
       where: { id: user.id },
       data: { 
-        credits: { decrement: 1 }
+        creditUsed: { increment: 1 },
       }
     });
 

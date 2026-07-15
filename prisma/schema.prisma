@@ -37,9 +37,11 @@ model User {
   name String?
   profilePic String?
   credits Int @default(5)
+  creditUsed Int @default(0)
   createdAt DateTime @default(now())
   resetTokens PasswordResetToken[]
   refreshToken RefreshToken[]
+  transactions Transaction[]
 }
 
 model PasswordResetToken {
@@ -65,5 +67,22 @@ model RefreshToken {
 
   userId String
   user User @relation(fields: [userId], references: [id], onDelete: Cascade) // 'fields' for foreign-key and 'references' for primary key (in foreign)
+}
+
+model Transaction {
+  id              String   @id @default(cuid())
+  razorpayOrderId String   @unique
+  paymentId       String?  @unique
+  signature       String?
+  amount          Int      // in paise
+  currency        String   @default("INR")
+  credits         Int      // credits added in this transaction
+  status          String   @default("captured") // e.g. captured, pending, failed
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([userId])
 }
 

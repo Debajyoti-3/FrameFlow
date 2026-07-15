@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { CheckAuth } from "@/lib/checkAuth";
 import { prisma } from "@/lib/prisma";
 import Razorpay from "razorpay";
+import { redis } from "@/lib/rateLimit";
 
 const instance = new Razorpay({
   key_id: process.env.NEXT_PUBLIC_RAZORPAY_API_KEY!,
@@ -24,6 +25,18 @@ export async function POST(req: NextRequest) {
         { error: "Missing required payment fields" },
         { status: 400 }
       );
+    }
+
+    // Check if this payment ID has already been processed (idempotency check)
+    const paymentKey = `payment:processed:${razorpay_payment_id}`;
+    const isProcessed = await redis.get(paymentKey);
+    if (isProcessed) {
+      console.log(`[PAYMENT ALREADY PROCESSED] Payment ID: ${razorpay_payment_id} was already credited.`);
+      return NextResponse.json({
+        success: true,
+        message: "Payment verified successfully! (Already processed)",
+        creditsAdded: 0,
+      });
     }
 
     // Verify signature using the correct secret_key
@@ -58,17 +71,39 @@ export async function POST(req: NextRequest) {
     }
 
     if (creditsToAdd > 0) {
-      // Update user credits
-      await prisma.user.update({
-        where: { id: user.id },
-        data: {
-          credits: { increment: creditsToAdd },
-        },
-      });
+      // Mark as processed in Redis (7 days TTL) to prevent duplicate crediting via webhook
+      await redis.set(paymentKey, "true", { ex: 60 * 60 * 24 * 7 });
 
-      // console.log(
-      //   `[PAYMENT SUCCESS] User ${user.email} (${user.id}) successfully purchased ${creditsToAdd} credits for INR ${amount / 100} (Order ID: ${razorpay_order_id}, Payment ID: ${razorpay_payment_id})`
-      // );
+      // Update user credits and create/update transaction record in a transaction
+      await prisma.$transaction([
+        prisma.user.update({
+          where: { id: user.id },
+          data: {
+            credits: { increment: creditsToAdd },
+          },
+        }),
+        prisma.transaction.upsert({
+          where: { razorpayOrderId: razorpay_order_id },
+          update: {
+            paymentId: razorpay_payment_id,
+            signature: razorpay_signature,
+            status: "captured",
+          },
+          create: {
+            razorpayOrderId: razorpay_order_id,
+            paymentId: razorpay_payment_id,
+            signature: razorpay_signature,
+            amount: amount,
+            credits: creditsToAdd,
+            status: "captured",
+            userId: user.id,
+          },
+        }),
+      ]);
+
+      console.log(
+        `[PAYMENT SUCCESS] User ${user.email} (${user.id}) successfully purchased ${creditsToAdd} credits for INR ${amount / 100} (Order ID: ${razorpay_order_id}, Payment ID: ${razorpay_payment_id})`
+      );
     }
 
     

@@ -12,6 +12,7 @@ import { cn } from "@/lib/utils";
 function Dashboard() {
   const [videos, setVideos] = useState<Video[]>([]);
   const [credits, setCredits] = useState<number | null>(null);
+  const [creditUsed, setCreditUsed] = useState<number | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,6 +32,7 @@ function Dashboard() {
 
       if (profileRes.data?.user) {
         setCredits(profileRes.data.user.credits ?? 5);
+        setCreditUsed(profileRes.data.user.creditUsed ?? 0);
       }
     } catch (error: any) {
       console.error("Dashboard fetch error:", error);
@@ -83,10 +85,10 @@ function Dashboard() {
     );
   }
 
-  const maxCredits = 5;
-  const remaining = credits !== null ? credits : 5;
-  const used = Math.max(0, maxCredits - remaining);
-  const usagePercent = (used / maxCredits) * 100;
+  const totalCredits = credits !== null ? credits : 5;
+  const used = creditUsed !== null ? creditUsed : 0;
+  const remaining = Math.max(0, totalCredits - used);
+  const usagePercent = totalCredits > 0 ? (used / totalCredits) * 100 : 0;
   const isHighUsage = usagePercent >= 80;
 
   return (
@@ -106,9 +108,11 @@ function Dashboard() {
               <h2 className="text-sm font-semibold text-slate-700 dark:text-slate-300">
                 Credits Usage
               </h2>
-              <p className="text-xs text-slate-500 dark:text-slate-400">
-                Remaining: <span className="font-bold text-slate-800 dark:text-slate-200">{remaining}</span> / {maxCredits}
-              </p>
+              <div className="text-xs text-slate-500 dark:text-slate-400 space-y-0.5 mt-0.5">
+                <div>Total: <span className="font-semibold text-slate-800 dark:text-slate-200">{totalCredits}</span></div>
+                <div>Used: <span className="font-semibold text-slate-800 dark:text-slate-200">{used}</span></div>
+                <div>Remaining: <span className="font-semibold text-slate-800 dark:text-slate-200">{remaining}</span></div>
+              </div>
             </div>
             <div className="text-right">
               <span className={cn(
