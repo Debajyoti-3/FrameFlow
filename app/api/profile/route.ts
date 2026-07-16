@@ -13,6 +13,13 @@ export async function GET() {
       where: {
         id: userData.id,
       },
+      include: {
+        transactions: {
+          orderBy: {
+            createdAt: "desc",
+          },
+        },
+      },
     });
 
     if (!fetchedUser) {
@@ -24,9 +31,10 @@ export async function GET() {
     const profilePic = fetchedUser?.profilePic || null;
     const credits = fetchedUser?.credits;
     const creditUsed = fetchedUser?.creditUsed ?? 0;
+    const transactions = fetchedUser?.transactions || [];
 
     return NextResponse.json({
-      user: { name, email, profilePic, credits, creditUsed },
+      user: { name, email, profilePic, credits, creditUsed, transactions },
       messege: "user data fetched",
     });
   } catch (error) {

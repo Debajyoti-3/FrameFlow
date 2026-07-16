@@ -118,10 +118,9 @@ export default function AppLayout({
         <div className="flex flex-col h-full">
           <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800">
             <Link href="/" className="flex items-center gap-2">
-              <ImageIcon className="w-8 h-8 text-slate-900 dark:text-slate-100" />
-              <span className="text-xl font-bold text-slate-900 dark:text-slate-100">
-                FrameFlow
-              </span>
+              <h1 className="text-xl font-black tracking-tight text-slate-900 dark:text-white">
+                FrameFlow<span className="text-blue-500">.</span>
+              </h1>
             </Link>
             <Button
               variant="ghost"
@@ -193,7 +192,7 @@ export default function AppLayout({
             <div className="flex items-center gap-4">
               {user && (
                 <>
-                  <Link href="/subscription">
+                  <Link href="/subscription" className="hidden md:block">
                     <Button
                       variant="default"
                       size="sm"
@@ -229,7 +228,7 @@ export default function AppLayout({
                       <Avatar className="h-8 w-8">
                         {user.profilePic ? (
                           <AvatarImage 
-                            src={`https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_fill,g_face,w_100,h_100,r_max/${user.profilePic}`} 
+                            src={getProfileImageUrl(user.profilePic, { width: 100, height: 100 })} 
                             alt="Profile" 
                           />
                         ) : (
