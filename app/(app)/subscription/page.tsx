@@ -36,10 +36,10 @@ const plans = [
     id: "Pro",
     name: "Pro Pack",
     price: 5,
-    credits: 60,
+    credits: 30,
     description: "Great value for active creators and designers.",
     features: [
-      "60 Premium Credits",
+      "30 Premium Credits",
       "All image & video processing tools",
       "Priority customer support",
       "Save 33% per credit compared to Starter"
@@ -51,10 +51,10 @@ const plans = [
     id: "Pro Max",
     name: "Pro Max Pack",
     price: 10,
-    credits: 150,
+    credits: 70,
     description: "For professional agencies requiring high volumes.",
     features: [
-      "150 Premium Credits",
+      "70 Premium Credits",
       "Highest priority execution speeds",
       "Dedicated 24/7 account support",
       "Custom integrations assistance",

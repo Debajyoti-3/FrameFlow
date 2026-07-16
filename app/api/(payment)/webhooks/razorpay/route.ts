@@ -74,9 +74,9 @@ export async function POST(req: NextRequest) {
       if (amount === 100) {
         creditsToAdd = 5;
       } else if (amount === 500) {
-        creditsToAdd = 60;
+        creditsToAdd = 30;
       } else if (amount === 1000) {
-        creditsToAdd = 150;
+        creditsToAdd = 70;
       } else {
         creditsToAdd = Math.floor((amount * 5) / 100);
       }
