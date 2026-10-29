@@ -19,7 +19,7 @@ export const authLimiter = new Ratelimit({
 export const uploadLimiter = new Ratelimit({
   redis,
 
-  limiter: Ratelimit.fixedWindow(5, "1 h"),
+  limiter: Ratelimit.fixedWindow(5, "10 m"),
 
   analytics: true,
 
